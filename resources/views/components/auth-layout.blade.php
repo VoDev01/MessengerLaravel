@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%;">
 
 <head>
     <meta charset="UTF-8">
@@ -9,8 +9,7 @@
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>{{ $title }}</title>
 </head>
-
-<body>
+<body class="container d-flex flex-column align-middle justify-content-center h-100" style="width: 500px;">
     {{ $slot }}
 </body>
 

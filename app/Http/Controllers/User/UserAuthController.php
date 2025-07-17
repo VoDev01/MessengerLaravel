@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Hash;
 
 class UserAuthController extends Controller
 {
-    public function login(UserAuthLoginRequest $request)
+    public function login()
+    {
+        return view('user.auth.login');
+    }
+
+    public function postLogin(UserAuthLoginRequest $request)
     {
         $validated = $request->validated();
-        $user = User::where('email', $validated['email'])->get()->first;
-        if (Hash::check($validated['password'], $user->password, ['']))
+        $user = User::where('email', $validated['email'])->get()->first();
+        if (Hash::check($validated['password'], $user->password))
         {
             return redirect()->route('home');
         }
@@ -24,7 +29,12 @@ class UserAuthController extends Controller
         }
     }
 
-    public function register(UserAuthRegisterRequest $request)
+    public function register()
+    {
+        return view('user.auth.register');
+    }
+
+    public function postRegister(UserAuthRegisterRequest $request)
     {
         $validated = $request->validated();
         $user = User::create([

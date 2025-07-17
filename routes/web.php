@@ -7,6 +7,8 @@ Route::get('/', function () {
     return view('home');
 })->middleware('auth')->name('home');
 Route::controller(UserAuthController::class)->group(function (){
-    Route::post('login', 'login');
-    Route::post('register', 'register');
+    Route::get('login', 'login')->name('login');
+    Route::post('postLogin', 'postLogin');
+    Route::get('register', 'register');
+    Route::post('postRegister', 'postRegister');
 });

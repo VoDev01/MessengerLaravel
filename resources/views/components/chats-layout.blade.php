@@ -9,7 +9,7 @@
     <title>{{ $title }}</title>
 </head>
 
-<body>
+<body class="container">
     {{ $slot }}
 </body>
 
