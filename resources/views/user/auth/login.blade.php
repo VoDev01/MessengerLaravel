@@ -13,8 +13,8 @@
             <input type="password" class="form-control" name="password" id="password" />
         </div>
         <x-error field="password" />
-        <div class="d-flex justify-content-evenly">
-            <button class="btn btn-primary">Войти</button>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Войти</button>
             <a class="btn btn-secondary" href="/register">Зарегестрироваться</a>
         </div>
     </form>

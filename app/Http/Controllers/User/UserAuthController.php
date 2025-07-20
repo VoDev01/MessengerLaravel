@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Auth\UserAuthLoginRequest;
 use App\Http\Requests\User\Auth\UserAuthRegisterRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserAuthController extends Controller
 {
@@ -21,6 +23,7 @@ class UserAuthController extends Controller
         $user = User::where('email', $validated['email'])->get()->first();
         if (Hash::check($validated['password'], $user->password))
         {
+            Auth::login($user);
             return redirect()->route('home');
         }
         else
@@ -37,10 +40,17 @@ class UserAuthController extends Controller
     public function postRegister(UserAuthRegisterRequest $request)
     {
         $validated = $request->validated();
+        
+        if ($validated['pfp'] != null)
+            $pfp = Storage::putFile("/public/images/user_{$validated['name']}_pfp.png", $validated['pfp']);
+
+        $pfp = 'https://letters.noticeable.io/' . strtoupper(substr($validated['name'], 0, 1)) . rand(0, 19) . '.png';
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => $validated['password']
+            'password' => $validated['password'],
+            'pfp' => $pfp
         ]);
         return redirect()->route('home');
     }
