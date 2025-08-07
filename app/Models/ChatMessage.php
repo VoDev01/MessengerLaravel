@@ -12,6 +12,8 @@ class ChatMessage extends Model
 
     protected $fillable = [
         'text',
+        'chat_id',
+        'sender_id'
     ];
 
     public function chat()
@@ -22,5 +24,10 @@ class ChatMessage extends Model
     public function attachments()
     {
         return $this->hasMany(ChatMessageAttachment::class, 'chat_message_id', 'id');
+    }
+    
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');  
     }
 }

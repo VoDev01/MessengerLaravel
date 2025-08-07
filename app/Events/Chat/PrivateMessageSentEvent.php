@@ -2,18 +2,17 @@
 
 namespace App\Events\Chat;
 
-use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class MessageSentEvent implements ShouldBroadcast
+class PrivateMessageSentEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,7 +21,7 @@ class MessageSentEvent implements ShouldBroadcast
      */
     public function __construct(public ChatMessage $chatMessage, public User $user)
     {
-        //
+        
     }
 
     /**
@@ -33,7 +32,7 @@ class MessageSentEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat' . $this->chatMessage->chat->name),
+            new PrivateChannel('chat.private.'.$this->chatMessage->chat->name),
         ];
     }
 

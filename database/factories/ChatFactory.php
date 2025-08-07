@@ -21,7 +21,7 @@ class ChatFactory extends Factory
         return [
             'name' => $name,
             'logo' => 'https://letters.noticeable.io/' . strtoupper(substr($name, 0, 1)) . rand(0, 19) . '.png',
-            'created_at' => Carbon::now()->format('yy-dd-mm h:i:s')
+            'created_at' => Carbon::now()->format('Y-d-m H:i:s')
         ];
     }
 }

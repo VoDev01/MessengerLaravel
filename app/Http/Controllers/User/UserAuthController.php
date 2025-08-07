@@ -40,17 +40,23 @@ class UserAuthController extends Controller
     public function postRegister(UserAuthRegisterRequest $request)
     {
         $validated = $request->validated();
-        
-        if ($validated['pfp'] != null)
-            $pfp = Storage::putFile("/public/images/user_{$validated['name']}_pfp.png", $validated['pfp']);
 
+        $defaultPfp = true;
         $pfp = 'https://letters.noticeable.io/' . strtoupper(substr($validated['name'], 0, 1)) . rand(0, 19) . '.png';
+        
+        if (array_key_exists('pfp', $validated))
+        {
+            $pfp = Storage::putFile("/public/images/user_{$validated['name']}_pfp.png", $validated['pfp']);
+            $defaultPfp = false;
+        }
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
-            'pfp' => $pfp
+            'phone' => $validated['phone'],
+            'pfp' => $pfp,
+            'default_pfp' => $defaultPfp
         ]);
         return redirect()->route('home');
     }

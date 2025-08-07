@@ -14,8 +14,10 @@ class Role extends Model
         'role'
     ];
 
+    public $timestamps = false;
+
     public function users()
     {
-        return $this->belongsToMany(User::class, 'chat_users', 'role_id', 'user_id');
+        return $this->hasMany(User::class);
     }
 }

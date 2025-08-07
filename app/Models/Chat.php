@@ -16,6 +16,11 @@ class Chat extends Model
 
     ];
 
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('name', $value)->firstOrFail();
+    }
+
     public function messages()
     {
         return $this->hasMany(ChatMessage::class, 'chat_id', 'id');
@@ -23,6 +28,6 @@ class Chat extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'chat_users', 'chat_id', 'user_id');
+        return $this->hasMany(User::class);
     }
 }
