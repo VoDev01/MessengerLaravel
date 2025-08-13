@@ -32,7 +32,7 @@ class PrivateMessageSentEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat.private.'.$this->chatMessage->chat->name),
+            new PrivateChannel('chat.private.'.$this->chatMessage->chat->link_name),
         ];
     }
 
@@ -41,5 +41,9 @@ class PrivateMessageSentEvent implements ShouldBroadcast
         return [
             'message' => $this->chatMessage
         ];
+    }
+
+    public function broadcastAs(): string {
+        return 'private.message.sent';
     }
 }

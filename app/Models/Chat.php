@@ -18,7 +18,8 @@ class Chat extends Model
 
     public function resolveRouteBinding($value, $field = null)
     {
-        return $this->where('name', $value)->firstOrFail();
+        $linkName = str_contains($value, '@') ? $value : '@' . $value;
+        return $this->with('users')->where('link_name', $linkName)->firstOrFail();
     }
 
     public function messages()
@@ -28,6 +29,6 @@ class Chat extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'chat_users', 'user_id', 'chat_id');
     }
 }

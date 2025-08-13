@@ -5,11 +5,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('chat.private.{name}', function (User $user, string $name) {
+Broadcast::channel('chat.private.{chat}', function (User $user, Chat $chat) {
     if(!Auth::check())
         return false;
-
-    $chat = Chat::where('name', $name)->get()->first();
 
     foreach($chat->users as $chatUser)
     {
@@ -21,6 +19,6 @@ Broadcast::channel('chat.private.{name}', function (User $user, string $name) {
     return false;
 });
 
-Broadcast::channel('chat.{name}', function (User $user, string $name){
-    return Auth::check();
+Broadcast::channel('chat.{chat}', function (User $user, Chat $chat){
+    return Auth::id() === $user->id;
 });

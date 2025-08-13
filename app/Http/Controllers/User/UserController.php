@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function home()
     {
-        return view('home', ['user' => Auth::user()]);
+        return view('home', ['currentUser' => Auth::user()]);
     }
     public function profile()
     {

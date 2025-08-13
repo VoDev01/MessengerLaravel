@@ -2,17 +2,18 @@
 
 namespace App\View\Components;
 
+use App\Models\ChatMessage;
 use Closure;
-use App\Models\User;
-use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\View\Component;
 
-class ChatsLayout extends Component
+class ChatMessages extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct(public User $currentUser)
+    public function __construct(public Collection $messages)
     {
         //
     }
@@ -22,6 +23,6 @@ class ChatsLayout extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.chats-layout', ['currentUser' => $this->currentUser]);
+        return view('components.chat-messages', ['messages' => $this->messages]);
     }
 }

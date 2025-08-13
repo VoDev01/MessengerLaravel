@@ -2,17 +2,18 @@
 
 namespace App\View\Components;
 
-use Closure;
+use App\Models\Chat;
 use App\Models\User;
-use Illuminate\View\Component;
+use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
 
-class ChatsLayout extends Component
+class ChatForm extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct(public User $currentUser)
+    public function __construct(public Chat $chat, public User $currentUser)
     {
         //
     }
@@ -22,6 +23,6 @@ class ChatsLayout extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.chats-layout', ['currentUser' => $this->currentUser]);
+        return view('components.chat-form', ['chat' => $this->chat, 'currentUser' => $this->currentUser]);
     }
 }

@@ -15,7 +15,7 @@ Route::middleware('web')->group(function ()
     });
     Route::controller(ChatController::class)->prefix('chat/{chat}')->middleware(['auth'])->group(function()
     {
-        Route::get('index', 'index');
+        Route::get('/', 'index');
         Route::post('store', 'store');
     });
     Route::controller(UserAuthController::class)->group(function ()

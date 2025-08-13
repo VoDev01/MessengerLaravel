@@ -15,7 +15,44 @@
 </head>
 
 <body class="container-fluid mt-2">
-    {{ $slot }}
+
+    <div class="row">
+        <nav class="col-2">
+            <div class="row">
+                <div class="col">
+                    @if ($currentUser->default_pfp)
+                        <img src="{{ $currentUser->pfp }}" alt="Аватарка {{ $currentUser->name }}"
+                            style="border-radius: 50%;">
+                    @else
+                        <img src="{{ asset('$currentUser->pfp') }}" alt="Аватарка {{ $currentUser->name }}"
+                            style="border-radius: 50%;">
+                    @endif
+                </div>
+                <div class="col">{{ $currentUser->name }}</div>
+            </div>
+            <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#profiles"
+                aria-expanded="false" aria-controls="profiles">
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="collapse" id="profiles">
+                <a href="/new_account">Добавить аккаунт</a>
+            </div>
+            <div class="d-flex flex-column">
+                <a>Профиль</a>
+                <a href="/chat/create">Создать группу</a>
+                <a>Настройки</a>
+                <a>Контакты</a>
+                <a>Звонки</a>
+                <a>Избранное</a>
+                <a href="/logout">Выйти</a>
+            </div>
+        </nav>
+        <div class="col-10 d-flex flex-column align-items-center">
+            <div style="width: 500px;">
+                {{ $slot }}
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

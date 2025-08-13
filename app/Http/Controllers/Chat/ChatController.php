@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
-use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
@@ -19,18 +18,14 @@ class ChatController extends Controller
      */
     public function index(Chat $chat)
     {
-        $users = $chat->users;
-        $currentUser = $users[array_search(Auth::user(), $users)];
-
         if (Chat::where('name', $chat->name)->get() === null)
             return redirect()->back(404);
 
         $messages = ChatMessage::with(['sender', 'chat'])
-            ->where('sender_id', $currentUser)
             ->where('chat_id', $chat->id)
             ->get();
 
-        return response()->json($messages);
+        return view('chat.index', ['messages' => $messages, 'chat' => $chat, 'currentUser' => Auth::user()]);
     }
     /**
      * Store a newly created resource in storage.
@@ -40,15 +35,16 @@ class ChatController extends Controller
         $message = ChatMessage::create([
             'sender_id' => Auth::id(),
             'chat_id' => $chat->id,
-            'text' => $request->message,
-        ]);
+            'text' => $request->text,
+        ])->id;
+        $message = ChatMessage::with(['sender', 'chat'])->where('id', $message)->get()->first();
         if ($chat->visibility === ChatVisibilityEnum::Public->value)
             broadcast(new MessageSentEvent($message, Auth::user()))->toOthers();
 
         else if ($chat->visibility === ChatVisibilityEnum::Private->value)
             broadcast(new PrivateMessageSentEvent($message, Auth::user()))->toOthers();
 
-        return response()->json($message);
+        return response()->json(['success' => true]);
     }
 
     /**
