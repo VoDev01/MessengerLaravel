@@ -29,6 +29,6 @@ class Chat extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'chat_users', 'user_id', 'chat_id');
+        return $this->belongsToMany(User::class, 'chat_users', 'chat_id', 'user_id')->withPivot('role_id');
     }
 }

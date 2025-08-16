@@ -1,0 +1,39 @@
+.self-message {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    align-self: end;
+    flex-basis: auto;
+    min-width: 75px;
+    max-width: 500px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.foreign-message {
+    display: flex;
+    align-items: start;
+    align-self: start;
+    flex-direction: column;
+    flex-basis: auto;
+    min-width: 75px;
+    max-width: 500px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+#message-box{
+    display: flex;
+    flex-direction: column;;
+}
+#chat-box{
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+}
+.chat-form{
+    display: flex;
+    justify-content: space-between;
+}

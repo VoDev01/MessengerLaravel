@@ -12,11 +12,13 @@ Route::middleware('web')->group(function ()
         Route::get('/', 'home')->name('home');
         Route::get('profile', 'profile');
         Route::get('settings', 'settings');
+        Route::post('logout', 'logout');
     });
     Route::controller(ChatController::class)->prefix('chat/{chat}')->middleware(['auth'])->group(function()
     {
         Route::get('/', 'index');
         Route::post('store', 'store');
+        Route::post('join', 'join');
     });
     Route::controller(UserAuthController::class)->group(function ()
     {

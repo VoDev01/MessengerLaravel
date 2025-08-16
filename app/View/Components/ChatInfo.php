@@ -3,17 +3,16 @@
 namespace App\View\Components;
 
 use App\Models\Chat;
-use App\Models\User;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class ChatForm extends Component
+class ChatInfo extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct(public Chat $chat, public User $currentUser, public bool $userIsInChat)
+    public function __construct(public Chat $chat)
     {
         //
     }
@@ -23,6 +22,6 @@ class ChatForm extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.chat-form', ['chat' => $this->chat, 'currentUser' => $this->currentUser, 'userIsInChat' => $this->userIsInChat]);
+        return view('components.chat-info', ['chat' => $this->chat]);
     }
 }

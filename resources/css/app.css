@@ -1,6 +1,6 @@
 @import '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
 @import './important.css';
-@import './style.css';
+@import './chat.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -50,11 +50,11 @@ class User extends Authenticatable
 
     public function chats()
     {
-        return $this->belongsToMany(Chat::class, 'chat_users', 'chat_id', 'user_id')->withPivot('role_id');
+        return $this->belongsToMany(Chat::class, 'chat_users', 'user_id', 'chat_id')->withPivot('role_id');
     }
 
     public function chatRoles()
     {
-        return $this->belongsToMany(Role::class, 'chat_users', 'role_id', 'user_id')->withPivot('chat_id');
+        return $this->belongsToMany(Role::class, 'chat_users', 'user_id', 'role_id')->withPivot('chat_id');
     }
 }

@@ -42,13 +42,15 @@
                 <a href="/chat/create">Создать группу</a>
                 <a>Настройки</a>
                 <a>Контакты</a>
-                <a>Звонки</a>
                 <a>Избранное</a>
-                <a href="/logout">Выйти</a>
+                <form method="POST" action="/logout"> 
+                    @csrf
+                    <button type="submit">Выйти</button>
+                </form>
             </div>
         </nav>
         <div class="col-10 d-flex flex-column align-items-center">
-            <div style="width: 500px;">
+            <div id="chat-box">
                 {{ $slot }}
             </div>
         </div>
