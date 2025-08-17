@@ -31,4 +31,8 @@ class UserController extends Controller
         Auth::logout();
         return redirect()->route('login');
     }
+    public function chats()
+    {
+        return response()->json(['chats' => Chat::with('users')->where('user_id', Auth::id())]);
+    }
 }

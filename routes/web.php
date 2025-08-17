@@ -13,6 +13,7 @@ Route::middleware('web')->group(function ()
         Route::get('profile', 'profile');
         Route::get('settings', 'settings');
         Route::post('logout', 'logout');
+        Route::post('chats', 'chats');
     });
     Route::controller(ChatController::class)->prefix('chat/{chat}')->middleware(['auth'])->group(function()
     {

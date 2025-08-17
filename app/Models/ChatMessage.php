@@ -19,6 +19,27 @@ class ChatMessage extends Model
         'sender_id'
     ];
 
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: function($value) { 
+                return (new Carbon($value, 'Europe/Moscow'))->format('Y-m-d H:i:s'); 
+            },
+            set: function($value) { 
+                return (new Carbon($value, 'Europe/Moscow'))->format('Y-m-d H:i:s'); 
+        });
+    }
+
+    protected function updatedAt(): Attribute
+    {return Attribute::make(
+            get: function($value) { 
+                return (new Carbon($value, 'Europe/Moscow'))->format('Y-m-d H:i:s'); 
+            },
+            set: function($value) { 
+                return (new Carbon($value, 'Europe/Moscow'))->format('Y-m-d H:i:s'); 
+        });
+    }
+
     public function chat()
     {
         return $this->belongsTo(Chat::class, 'chat_id', 'id');
