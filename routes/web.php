@@ -3,6 +3,7 @@
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\User\UserAuthController;
 use App\Http\Controllers\User\UserController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function ()
@@ -20,6 +21,7 @@ Route::middleware('web')->group(function ()
         Route::get('/', 'index');
         Route::post('store', 'store');
         Route::post('join', 'join');
+        Route::post('seen', 'seen')->withoutMiddleware(VerifyCsrfToken::class);
     });
     Route::controller(UserAuthController::class)->group(function ()
     {

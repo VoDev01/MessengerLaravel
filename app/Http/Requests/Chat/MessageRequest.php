@@ -22,13 +22,8 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => ['string', 'min:1', 'max:1000'],
-            'attachments' => ['array', 'nullable'],
-            'sender' => ['string', 'min:1', 'max:100'],
-            'recipient' => ['string', 'min:1', 'max:100'],
-            'sent_at' => ['date'],
-            'received' => ['boolean'],
-            'read' => ['boolean']
+            'text' => ['string', 'min:1', 'max:1000'],
+            'sender_id' => ['integer']
         ];
     }
 }
