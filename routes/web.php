@@ -18,11 +18,12 @@ Route::middleware('web')->group(function ()
     });
     Route::controller(ChatController::class)->prefix('chat/{chat}')->middleware(['auth'])->group(function()
     {
-        Route::get('/', 'index');
+        Route::get('/', 'group');
         Route::post('store', 'store');
         Route::post('join', 'join');
         Route::post('seen', 'seen')->withoutMiddleware(VerifyCsrfToken::class);
     });
+    Route::get('/direct/{user}', [ChatController::class, 'direct'])->middleware(['auth']);
     Route::controller(UserAuthController::class)->group(function ()
     {
         Route::get('login', 'login')->name('login');

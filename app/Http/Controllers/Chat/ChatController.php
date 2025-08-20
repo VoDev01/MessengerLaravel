@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Actions\CreateDirectChatAction;
+use App\Actions\HandleChatMessagesAction;
 use App\Enums\ChatMessageStatusEnum;
 use Carbon\Carbon;
 use App\Models\Chat;
@@ -26,10 +28,10 @@ class ChatController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Chat $chat, Request $request)
+    public function group(Chat $chat, Request $request)
     {
         if (Chat::where('name', $chat->name)->get() === null)
-            return redirect()->back(404);
+            abort(404);
 
         $userIsInChat = Gate::inspect('view', $chat)->allowed();
         if($chat->visibility === ChatVisibilityEnum::Private->value)
@@ -40,29 +42,16 @@ class ChatController extends Controller
 
         $chat = Chat::with('users')->where('id', $chat->id)->get()->first();
 
-        $messages = ChatMessage::with(['sender', 'chat'])
-            ->where('chat_id', $chat->id);
+        return HandleChatMessagesAction::handle($chat, $request, $userIsInChat, 'chat.index');
+    }
+    public function direct(User $user, Request $request)
+    {
+        if(User::where('link_name', $user->link_name)->get() === null)
+            abort(404);
 
-        if($request->expectsJson())
-        {
-            $messages = $messages->where('created_at', '>', $request->lastMessageTime);
-            if($messages->get()->count() <= 0)
-                return response()->json();
-            else if($messages->get()->count() == 1)
-            {
-                $messages = $messages->get();
-                return response()->json(['messages' => $messages->toArray(), 'currentUserId' => Auth::id()]);
-            }
-            else
-            {
-                $messages = $messages->limit(10)->get();
-                return response()->json(['messages' => $messages->toArray(), 'currentUserId' => Auth::id()]);
-            }
-        }
-        else
-        {
-            return view('chat.index', ['messages' => $messages->limit(10)->get(), 'chat' => $chat, 'currentUser' => Auth::user(), 'userIsInChat' => $userIsInChat]);
-        }
+        $chat = CreateDirectChatAction::create($user);
+
+        return HandleChatMessagesAction::handle($chat, $request, true, 'chat.direct');
     }
     /**
      * Store a newly created resource in storage.
@@ -99,16 +88,25 @@ class ChatController extends Controller
     {
         $user = User::where('id', Auth::id())->get()->first();
         $date = Carbon::now()->format('Y-m-d H:i:s');
+
         DB::insert('INSERT INTO chat_users (chat_id, user_id, role_id, created_at, updated_at) VALUES(?,?,?,?,?)', 
-        [$chat->id, $user->id, Role::where('role', 'User')->get()->first()->id, $date, $date]);
+            [
+                $chat->id, 
+                $user->id,
+                Role::where('role', 'User')->get()->first()->id,
+                $date,
+                $date
+            ]
+        );
+
         $chatMessages = ChatMessage::with('sender')->where('chat_id', $chat->id)->get();
+
         return response()->json(['messages' => $chatMessages, 'currentUserId' => Auth::id(), 'chatName' => $chat->name]);
     }
 
     public function seen(Chat $chat, Request $request)
     {
         $messageIds = json_decode($request->messageIds);
-        //DB::update('UPDATE chat_messages SET `status` = \'SEEN\' WHERE chat_id = ? AND id IN(?)', [$chat->id, implode(', ', $messageIds)]);
         broadcast(new MessageSeenEvent($messageIds, $chat->link_name, Auth::user()))->toOthers();
         return response()->json();
     }

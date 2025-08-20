@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\ChatMessageStatusEnum;
+use App\Enums\ChatTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,8 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('chat_messages', function (Blueprint $table) {
-            $table->enum('status', array_column(ChatMessageStatusEnum::cases(), 'value'))->default(ChatMessageStatusEnum::Processing->value);
+        Schema::table('chats', function (Blueprint $table)
+        {
+            $table->enum('type', array_column(ChatTypeEnum::cases(), 'value'));
         });
     }
 
@@ -22,8 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('chat_messages', function (Blueprint $table) {
-            $table->dropColumn('status');
+        Schema::table('chats', function (Blueprint $table)
+        {
+            $table->dropColumn('type');
         });
     }
 };
