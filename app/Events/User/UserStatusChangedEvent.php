@@ -2,6 +2,7 @@
 
 namespace App\Events\User;
 
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,14 +11,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserOnlineEvent
+class UserStatusChangedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(public User $user, public bool $online)
     {
         //
     }
@@ -30,7 +31,12 @@ class UserOnlineEvent
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('user.' . $this->user->link_name),
         ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'user.status.changed';
     }
 }

@@ -12,7 +12,7 @@ class ChatInfo extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(public Chat $chat, public bool $showUserCount)
+    public function __construct(public Chat $chat, public bool $direct)
     {
         //
     }
@@ -22,6 +22,6 @@ class ChatInfo extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.chat-info', ['chat' => $this->chat, 'showUserCount' => $this->showUserCount]);
+        return view('components.chat-info', ['chat' => $this->chat, 'direct' => $this->direct]);
     }
 }

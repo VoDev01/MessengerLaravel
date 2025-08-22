@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Events\User\UserStatusChangedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class UserController extends Controller
     }
     public function logout()
     {
+        broadcast(new UserStatusChangedEvent(Auth::user(), false))->toOthers();
         Auth::logout();
         return redirect()->route('login');
     }

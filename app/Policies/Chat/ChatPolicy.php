@@ -35,6 +35,29 @@ class ChatPolicy
         return false;
     }
 
+    public function viewDirect(User $otherUser, User $currentUser, Chat $chat): bool
+    {
+        if (!Auth::check())
+            return false;
+
+        $usersInChat = [];
+
+        foreach($chat->users as $chatUser)
+        {
+            if($chatUser->id === $otherUser->id || $chatUser->id === $currentUser->id)
+            {
+                array_push($usersInChat, $chatUser->id);
+            }
+        }
+
+        var_dump($usersInChat);
+
+        if(count($usersInChat) < 2)
+            return false;
+
+        return true;
+    }
+
     /**
      * Determine whether the user can create models.
      */

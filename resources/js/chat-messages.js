@@ -1,12 +1,10 @@
 import $ from 'jquery';
 
-const chatName = $('#chat-name').val();
+export const chatName = $('#chat-name').val();
 let allMessagesLoaded = false;
 
-
-if ($('#chat-visibility').val() === 'PUBLIC') {
-
-    window.Echo.private('chat.' + chatName)
+export function listenChat(channelName) {
+    window.Echo.private(channelName + chatName)
         .listen('.message.sent', (data) => {
             let time = new Date(data.message.created_at).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
             $('#message-box').append(`
@@ -34,9 +32,10 @@ if ($('#chat-visibility').val() === 'PUBLIC') {
                     ' <i class="bi bi-check2-all text-primary"></i>');
             });
         });
+}
 
-} else if ($('#chat-visibility').val() === 'PRIVATE') {
-    window.Echo.private('chat.private.' + chatName)
+export function listenPrivateChat(channelName) {
+    window.Echo.private(channelName + chatName)
         .listen('.private.message.sent', (data) => {
             let time = new Date(data.message.created_at).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
             $('.self-message:last i').remove();
@@ -61,102 +60,103 @@ if ($('#chat-visibility').val() === 'PUBLIC') {
         });
 }
 
-$(window).on('load', function () {
-    if ($('.foreign-message').length != 0) {
-        let elementsOnPage = [];
-        let windowHeight = $(window).height();
-        let scrollTop = $(window).scrollTop();
-        $('.foreign-message').each(function () {
-            let element = $(this);
-            let offset = element.offset();
-            let elementHeight = element.outerHeight();
+export function loadMessages() {
+    $(window).on('load', function () {
+        if ($('.foreign-message').length != 0) {
+            let elementsOnPage = [];
+            let windowHeight = $(window).height();
+            let scrollTop = $(window).scrollTop();
+            $('.foreign-message').each(function () {
+                let element = $(this);
+                let offset = element.offset();
+                let elementHeight = element.outerHeight();
 
-            if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
-                elementsOnPage.push($(element).data('message-id'));
-            }
-        });
-        elementsOnPage = JSON.stringify(elementsOnPage);
-        $.ajax({
-            method: 'POST',
-            url: '/chat/' + chatName + '/seen',
-            dataType: 'json',
-            data: {
-                messageIds: elementsOnPage
-            },
-            error: function (e) {
-                console.log(e);
-            }
-        })
-    }
-});
-
-$(window).on('scroll', function () {
-    if ($('.foreign-message').length != 0) {
-        let elementsOnPage = [];
-        let windowHeight = $(window).height();
-        let scrollTop = $(window).scrollTop();
-        $('.foreign-message').each(function () {
-            let element = $(this);
-            let offset = element.offset();
-            let elementHeight = element.outerHeight();
-
-            if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
-                elementsOnPage.push($(element).data('message-id'));
-            }
-        });
-        elementsOnPage = JSON.stringify(elementsOnPage);
-        $.ajax({
-            method: 'POST',
-            url: '/chat/' + chatName + '/seen',
-            dataType: 'json',
-            data: {
-                messageIds: elementsOnPage
-            },
-            error: function (e) {
-                console.log(e);
-            }
-        })
-    }
-    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-        if (!allMessagesLoaded) {
+                if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
+                    elementsOnPage.push($(element).data('message-id'));
+                }
+            });
+            elementsOnPage = JSON.stringify(elementsOnPage);
             $.ajax({
-                method: 'GET',
-                url: '/chat/' + chatName,
+                method: 'POST',
+                url: '/chat/' + chatName + '/seen',
                 dataType: 'json',
                 data: {
-                    lastMessageTime: $('#message-box div:last-child').data('message-timestamp')
+                    messageIds: elementsOnPage
                 },
                 error: function (e) {
                     console.log(e);
-                },
-                success: function (data) {
-                    if (data.messages == null) {
-                        allMessagesLoaded = true;
-                        return;
-                    }
-                    data.messages.forEach(message => {
-                        let time = new Date(message.created_at).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
-                        let messageStatus = '<i class="bi bi-three-dots"></i>';
-                        switch (message.status) {
+                }
+            })
+        }
+    });
 
-                            case 'PROCESSING':
-                                messageStatus = '<i class="bi bi-three-dots"></i>';
-                                break;
-                            case 'SENT':
-                                messageStatus = '<i class="bi bi-check2"></i>';
-                                break;
-                            case 'DELIVERED':
-                                messageStatus = '<i class="bi bi-check2-all"></i>';
-                                break;
-                            case 'SEEN':
-                                messageStatus = '<i class="bi bi-check2-all text-primary"></i>';
-                                break;
-                            case 'NOT_SENT':
-                                messageStatus = '<i class="bi bi-exclamation-circle"></i>';
-                                break;
+    $(window).on('scroll', function () {
+        if ($('.foreign-message').length != 0) {
+            let elementsOnPage = [];
+            let windowHeight = $(window).height();
+            let scrollTop = $(window).scrollTop();
+            $('.foreign-message').each(function () {
+                let element = $(this);
+                let offset = element.offset();
+                let elementHeight = element.outerHeight();
+
+                if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
+                    elementsOnPage.push($(element).data('message-id'));
+                }
+            });
+            elementsOnPage = JSON.stringify(elementsOnPage);
+            $.ajax({
+                method: 'POST',
+                url: '/chat/' + chatName + '/seen',
+                dataType: 'json',
+                data: {
+                    messageIds: elementsOnPage
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            })
+        }
+        if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+            if (!allMessagesLoaded) {
+                $.ajax({
+                    method: 'GET',
+                    url: '/chat/' + chatName,
+                    dataType: 'json',
+                    data: {
+                        lastMessageTime: $('#message-box div:last-child').data('message-timestamp')
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    },
+                    success: function (data) {
+                        if (data.messages == null) {
+                            allMessagesLoaded = true;
+                            return;
                         }
-                        if (message.sender.id == data.currentUserId) {
-                            $('.self-message').last().after(`
+                        data.messages.forEach(message => {
+                            let time = new Date(message.created_at).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
+                            let messageStatus = '<i class="bi bi-three-dots"></i>';
+                            switch (message.status) {
+
+                                case 'PROCESSING':
+                                    messageStatus = '<i class="bi bi-three-dots"></i>';
+                                    break;
+                                case 'SENT':
+                                    messageStatus = '<i class="bi bi-check2"></i>';
+                                    break;
+                                case 'DELIVERED':
+                                    messageStatus = '<i class="bi bi-check2-all"></i>';
+                                    break;
+                                case 'SEEN':
+                                    messageStatus = '<i class="bi bi-check2-all text-primary"></i>';
+                                    break;
+                                case 'NOT_SENT':
+                                    messageStatus = '<i class="bi bi-exclamation-circle"></i>';
+                                    break;
+                            }
+                            if (message.sender.id == data.currentUserId) {
+                                $('.self-message').last().after(`
                             <div class="self-message" data-message-timestamp="${message.created_at}" data-message-id="${message.id}">
                                 <p> 
                                     ${message.sender.name} 
@@ -169,9 +169,9 @@ $(window).on('scroll', function () {
                                 </p>
                             </div>
                             `);
-                        }
-                        else {
-                            $('.foreign-message').last().after(`
+                            }
+                            else {
+                                $('.foreign-message').last().after(`
                             <div class="foreign-message" data-message-timestamp="${message.created_at}" data-message-id="${message.id}">
                                 <p> 
                                     ${message.sender.name} 
@@ -184,20 +184,22 @@ $(window).on('scroll', function () {
                                 </p>
                             </div>
                             `);
-                        }
-                    });
-                }
-            });
+                            }
+                        });
+                    }
+                });
+            }
         }
-    }
-})
+    });
+}
 
-$('#chat-form').on('submit', function (e) {
-    e.preventDefault();
+export function submitMessage() {
+    $('#chat-form').on('submit', function (e) {
+        e.preventDefault();
 
-    let messageForm = $('#chat-form').serializeArray();
+        let messageForm = $('#chat-form').serializeArray();
 
-    $('#message-box').append(`
+        $('#message-box').append(`
         <div class="self-message" data-message-timestamp="${new Date().toISOString().slice(0, 19).replace('T', ' ')}">
             <p>
                 ${messageForm[2]['value']} 
@@ -211,21 +213,22 @@ $('#chat-form').on('submit', function (e) {
         </div>
     `);
 
-    $.ajax({
-        method: 'POST',
-        url: '/chat/' + chatName + '/store',
-        data: $('#chat-form').serialize(),
-        dataType: 'json',
-        headers: {
-            "X-Socket-ID": String(window.Echo.socketId())
-        },
-        error: function (data) {
-            console.log(data);
-        },
-        success: function (data) {
-            $('.self-message').last().attr('data-message-id', data.messageId);
-            $('.self-message:last p:last').find('i').remove();
-            $('.self-message:last :last-child').html($('.self-message:last :last-child').html() + ' <i class="bi bi-check2"></i>');
-        }
-    })
-});
+        $.ajax({
+            method: 'POST',
+            url: '/chat/' + chatName + '/store',
+            data: $('#chat-form').serialize(),
+            dataType: 'json',
+            headers: {
+                "X-Socket-ID": String(window.Echo.socketId())
+            },
+            error: function (data) {
+                console.log(data);
+            },
+            success: function (data) {
+                $('.self-message').last().attr('data-message-id', data.messageId);
+                $('.self-message:last p:last').find('i').remove();
+                $('.self-message:last :last-child').html($('.self-message:last :last-child').html() + ' <i class="bi bi-check2"></i>');
+            }
+        })
+    });
+}

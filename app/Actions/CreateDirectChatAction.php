@@ -13,13 +13,21 @@ use Illuminate\Support\Facades\Auth;
 
 class CreateDirectChatAction
 {
+    public static function getDirectLink(Chat $chat)
+    {
+        return "@direct_{$chat->users[0]->id}_{$chat->users[1]->id}";
+    }
+    public static function getDirectName(Chat $chat)
+    {
+        return "Direct_{$chat->users[0]->id}_{$chat->users[1]->id}";
+    }
     public static function create(User $user): Chat
     {
-        if (count(DB::select('SELECT * FROM chats WHERE chats.link_name = ?', [$user->link_name])) == 0)
+        if (count(DB::select('SELECT * FROM chats WHERE chats.link_name = ?', ["@direct_{$user->id}_" . Auth::id()])) == 0)
         {
             DB::insert('INSERT INTO chats (name, link_name, logo, created_at, updated_at, visibility, type) VALUES(?,?,?,?,?,?,?)', [
-                $user->name,
-                $user->link_name,
+                "Direct_{$user->id}_" . Auth::id(),
+                "@direct_{$user->id}_" . Auth::id(),
                 $user->pfp,
                 Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s'),
                 Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s'),
@@ -28,26 +36,28 @@ class CreateDirectChatAction
             ]);
         }
 
-        $chat = DB::select('SELECT * FROM chats WHERE chats.link_name = ?', [$user->link_name]);
+        $chat = Chat::with('users')->where('link_name', "@direct_{$user->id}_" . Auth::id())->get()->first();
 
-        if (count(DB::select('SELECT * FROM chat_users WHERE chat_users.chat_id = ?', [$chat[0]->id])) == 0)
+        if (count(DB::select('SELECT * FROM chat_users WHERE chat_users.chat_id = ?', [$chat->id])) == 0)
         {
+            $time = Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s');
             DB::insert(
                 'INSERT INTO chat_users (chat_id, user_id, role_id, created_at, updated_at) VALUES 
-                (:chat_id1,:user_id1,:role_id1, :timestamp, :timestamp), (:chat_id2, :user_id2, :role_id2, :timestamp, :timestamp)',
+                (:chat_id1,:user_id1,:role_id1, :time, :time1), (:chat_id2, :user_id2, :role_id2, :time2, :time3)',
                 [
-                    ':chat_id1' => $chat[0]->id,
+                    ':chat_id1' => $chat->id,
                     ':user_id1' => $user->id,
                     ':role_id1' => Role::where('role', 'User')->get()->first()->id,
-                    ':chat_id2' => $chat[0]->id,
+                    ':chat_id2' => $chat->id,
                     ':user_id2' => Auth::id(),
                     ':role_id2' => Role::where('role', 'User')->get()->first()->id,
-                    ':timestamp' => Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s')
+                    ':time' => $time,
+                    ':time1' => $time,
+                    ':time2' => $time,
+                    ':time3' => $time 
                 ]
             );
         }
-
-        $chat = Chat::hydrate(DB::select('SELECT * FROM chats INNER JOIN chat_users AS cu ON cu.chat_id = chats.id INNER JOIN users ON cu.user_id = users.id WHERE cu.id IS NOT NULL AND users.id IN (?,?)', [$user->id, Auth::id()]))->first();
 
         return $chat;
     }

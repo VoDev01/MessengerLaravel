@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\User\Auth\UserAuthLoginRequest;
-use App\Http\Requests\User\Auth\UserAuthRegisterRequest;
 use App\Models\User;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Events\User\UserStatusChangedEvent;
+use App\Http\Requests\User\Auth\UserAuthLoginRequest;
+use App\Http\Requests\User\Auth\UserAuthRegisterRequest;
 
 class UserAuthController extends Controller
 {
@@ -24,6 +25,7 @@ class UserAuthController extends Controller
         if (Hash::check($validated['password'], $user->password))
         {
             Auth::login($user);
+            broadcast(new UserStatusChangedEvent($user, true))->toOthers();
             return redirect()->route('home');
         }
         else

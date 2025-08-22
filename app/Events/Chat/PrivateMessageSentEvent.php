@@ -11,6 +11,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Support\Facades\Crypt;
 
 class PrivateMessageSentEvent implements ShouldBroadcast
 {
@@ -19,7 +20,7 @@ class PrivateMessageSentEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public ChatMessage $chatMessage, public User $user)
+    public function __construct(public ChatMessage $chatMessage, public User $user, public string $channel)
     {
         
     }
@@ -32,7 +33,7 @@ class PrivateMessageSentEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat.private.'.$this->chatMessage->chat->link_name),
+            new PrivateChannel(Crypt::decryptString($this->channel) . $this->chatMessage->chat->link_name),
         ];
     }
 

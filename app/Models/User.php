@@ -23,7 +23,8 @@ class User extends Authenticatable
         'phone',
         'password',
         'pfp',
-        'default_pfp'
+        'default_pfp',
+        'online'
     ];
 
     /**
@@ -51,7 +52,7 @@ class User extends Authenticatable
 
     public function resolveRouteBinding($value, $field = null)
     {
-        $linkName = str_contains('@', $value) ? $value : '@' . $value;
+        $linkName = str_contains($value, '@') ? $value : '@' . $value;
         $user = User::with(['chats', 'chats.messages'])->where('link_name', $linkName)->get()->first();
         return $user;
     }
