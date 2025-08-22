@@ -77,8 +77,8 @@ class ChatController extends Controller
 
         else if ($chat->visibility === ChatVisibilityEnum::Private->value)
         {
-            PrivateMessageDeliveredEvent::dispatch($chat->link_name, $message->id, Auth::user());
-            broadcast(new PrivateMessageSentEvent($message, Auth::user(), $chat->type === 'GROUP' ? 'chat.private.' : 'user.direct.'))->toOthers();
+            PrivateMessageDeliveredEvent::dispatch($chat->link_name, $message->id, Auth::user(), $chat->type === 'GROUP' ? 'chat.private.' : 'chat.direct.');
+            broadcast(new PrivateMessageSentEvent($message, Auth::user(), $chat->type === 'GROUP' ? 'chat.private.' : 'chat.direct.'))->toOthers();
         }
 
         return response()->json(['messageId' => $message->id]);

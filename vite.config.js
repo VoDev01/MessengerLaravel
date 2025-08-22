@@ -5,7 +5,7 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/css/app.css', 
+                'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/js/chat-join.js',
                 'resources/js/chat-load-chats.js',
@@ -16,5 +16,10 @@ export default defineConfig({
             ],
             refresh: true,
         }),
-    ]
+    ],
+    resolve: {
+        alias: {
+            '$': 'jquery'
+        }
+    }
 });

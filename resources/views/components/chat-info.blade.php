@@ -8,7 +8,7 @@
         </div>
         <div class="mx-3">
             <p>{{ $otherUser->name }}</p>
-            <p class="user-online">{{ $otherUser->online ? 'В сети' : 'Не в сети'}}</p>
+            <p class="user-online" data-user-link="{{$otherUser->link_name}}">{{ $otherUser->online ? 'В сети' : 'Не в сети'}}</p>
         </div>
     @else
         <div>

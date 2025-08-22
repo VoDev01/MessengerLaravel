@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 let allChatsLoaded = false;
 
 $(window).on('scroll', function () {

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import * as cm from './chat-messages';
 
 $('.user-online').map(function () {

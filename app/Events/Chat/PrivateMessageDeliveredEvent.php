@@ -39,6 +39,6 @@ class PrivateMessageDeliveredEvent implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return '.private.message.delivered';
+        return 'private.message.delivered';
     }
 }

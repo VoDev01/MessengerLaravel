@@ -1,7 +1,6 @@
-import $ from 'jquery';
 import * as cm from './chat-messages';
 
-cm.listenPrivateChat('user.direct.');
+cm.listenPrivateChat('chat.direct.');
 
 cm.loadMessages();
 

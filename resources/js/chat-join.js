@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 const chatName = $('#chat-name').val();
 
 $('#join-form').on('submit', function (e) {

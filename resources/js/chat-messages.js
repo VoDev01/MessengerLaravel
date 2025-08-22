@@ -1,7 +1,4 @@
-import $ from 'jquery';
-
 export const chatName = $('#chat-name').val();
-let allMessagesLoaded = false;
 
 export function listenChat(channelName) {
     window.Echo.private(channelName + chatName)
@@ -55,12 +52,21 @@ export function listenPrivateChat(channelName) {
             `);
         })
         .listen('.private.message.delivered', (data) => {
-            $(`.self-message[data-message-id="${data.messageId}"] p:last i`).remove();
-            $(`.self-message[data-message-id="${data.messageId}"] :last-child`).html($('.self-message:last :last-child').html() + ' <i class="bi bi-check2-all"></i>');
+            $(`.self-message[data-message-id="${data.messageId}"] p:last`).find('i').remove();
+            $(`.self-message[data-message-id="${data.messageId}"] p:last`).html($('.self-message:last p:last').html() + ' <i class="bi bi-check2-all"></i>');
+        })
+        .listen('.private.message.seen', (data) => {
+            data.messageIds.forEach(messageId => {
+                $(`.self-message[data-message-id="${messageId}"] p:last`).find('i').remove();
+                $(`.self-message[data-message-id="${messageId}"] p:last`).html($('.self-message:last p:last').html() +
+                    ' <i class="bi bi-check2-all text-primary"></i>');
+            });
         });
 }
 
 export function loadMessages() {
+
+    let allMessagesLoaded = false;
     $(window).on('load', function () {
         if ($('.foreign-message').length != 0) {
             let elementsOnPage = [];

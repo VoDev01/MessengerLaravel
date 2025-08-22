@@ -33,7 +33,7 @@ class PrivateMessageSentEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel(Crypt::decryptString($this->channel) . $this->chatMessage->chat->link_name),
+            new PrivateChannel($this->channel . $this->chatMessage->chat->link_name),
         ];
     }
 

@@ -23,7 +23,13 @@ class CreateDirectChatAction
     }
     public static function create(User $user): Chat
     {
-        if (count(DB::select('SELECT * FROM chats WHERE chats.link_name = ?', ["@direct_{$user->id}_" . Auth::id()])) == 0)
+        $chat = DB::select('SELECT id FROM chats WHERE chats.link_name = ?', ["@direct_{$user->id}_" . Auth::id()]);
+        if(empty($chat))
+        {
+            $chat = DB::select('SELECT id FROM chats WHERE chats.link_name = ?', ["@direct_" . Auth::id() . "_$user->id"]);
+        }
+
+        if (empty($chat))
         {
             DB::insert('INSERT INTO chats (name, link_name, logo, created_at, updated_at, visibility, type) VALUES(?,?,?,?,?,?,?)', [
                 "Direct_{$user->id}_" . Auth::id(),
@@ -34,21 +40,20 @@ class CreateDirectChatAction
                 ChatVisibilityEnum::Private->value,
                 ChatTypeEnum::Direct->value
             ]);
+            $chat = DB::select('SELECT id FROM chats WHERE chats.link_name = ?', ["@direct_" . Auth::id() . "_$user->id"]);
         }
 
-        $chat = Chat::with('users')->where('link_name', "@direct_{$user->id}_" . Auth::id())->get()->first();
-
-        if (count(DB::select('SELECT * FROM chat_users WHERE chat_users.chat_id = ?', [$chat->id])) == 0)
+        if (count(DB::select('SELECT chat_id FROM chat_users WHERE chat_users.chat_id = ?', [$chat[0]->id])) == 0)
         {
             $time = Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s');
             DB::insert(
                 'INSERT INTO chat_users (chat_id, user_id, role_id, created_at, updated_at) VALUES 
                 (:chat_id1,:user_id1,:role_id1, :time, :time1), (:chat_id2, :user_id2, :role_id2, :time2, :time3)',
                 [
-                    ':chat_id1' => $chat->id,
+                    ':chat_id1' => $chat[0]->id,
                     ':user_id1' => $user->id,
                     ':role_id1' => Role::where('role', 'User')->get()->first()->id,
-                    ':chat_id2' => $chat->id,
+                    ':chat_id2' => $chat[0]->id,
                     ':user_id2' => Auth::id(),
                     ':role_id2' => Role::where('role', 'User')->get()->first()->id,
                     ':time' => $time,
@@ -58,6 +63,8 @@ class CreateDirectChatAction
                 ]
             );
         }
+
+        $chat = Chat::with('users')->where('link_name', "@direct_{$user->id}_" . Auth::id())->orWhere('link_name', "@direct_" . Auth::id() . "_$user->id")->get()->first();
 
         return $chat;
     }
