@@ -20,7 +20,7 @@ class PrivateMessageDeliveredEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $chatName, public int $messageId, public User $user, public string $channel)
+    public function __construct(public string $chatName, public int $messageId, public string $messageCreatedAt, public string $channel)
     {
         //
     }

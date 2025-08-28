@@ -27,10 +27,12 @@ class UserController extends Controller
     {
         return view('profile');
     }
-    public function logout()
+    public function logout(Request $request)
     {
         broadcast(new UserStatusChangedEvent(Auth::user(), false))->toOthers();
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect()->route('login');
     }
     public function chats()

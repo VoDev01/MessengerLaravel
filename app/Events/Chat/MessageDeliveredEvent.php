@@ -19,7 +19,7 @@ class MessageDeliveredEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $chatName, public int $messageId, public User $user)
+    public function __construct(public string $chatName, public int $id, public string $createdAt)
     {
         //
     }

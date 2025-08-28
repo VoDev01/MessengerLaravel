@@ -3,7 +3,7 @@
         <?php $time = substr(explode(' ', $message->created_at)[1], 0, 5); ?>
         @if ($message->sender_id === $currentUser->id)
             <div class="self-message" data-message-timestamp="{{ $message->created_at }}"
-                data-message-id="{{ $message->id }}">
+                data-message-id="{{ $message->id }}" data-message-status="{{$message->status}}">
                 <p>{{ $message->sender->name }}</p>
                 <p>{{ $message->text }}</p>
                 <p>{{ $time }} <?php 

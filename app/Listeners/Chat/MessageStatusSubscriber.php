@@ -26,14 +26,15 @@ class MessageStatusSubscriber
      */
     public function handleMessageDelivered(MessageDeliveredEvent $event): void
     {
-        $message = ChatMessage::where('id', $event->messageId)->get()->first();
+        $message = ChatMessage::where('id', $event->id)->get()->first();
         $message->status = ChatMessageStatusEnum::Delivered->value;
         $message->save();
     }
 
     public function handleMessageSeen(MessageSeenEvent $event): void
     {
-        $messages = ChatMessage::whereIn('id', $event->messageIds)->get();
+        $messageIds = array_column($event->messages, 'id');
+        $messages = ChatMessage::whereIn('id', $messageIds)->get();
         foreach ($messages as $message)
         {
             $message->status = ChatMessageStatusEnum::Seen->value;

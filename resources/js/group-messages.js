@@ -6,6 +6,8 @@ if ($('#chat-visibility').val() === 'PUBLIC') {
     cm.listenPrivateChat('chat.private.');
 }
 
+cm.loadSeenMessages();
+
 cm.loadMessages();
 
 cm.submitMessage();

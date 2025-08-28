@@ -19,7 +19,7 @@ class MessageSeenEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public array $messageIds, public string $chatLinkName, public User $user)
+    public function __construct(public array $messages, public string $chatLinkName, public string $channel)
     {
         //
     }
@@ -32,7 +32,7 @@ class MessageSeenEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat.'.$this->chatLinkName),
+            new PrivateChannel($this->channel . $this->chatLinkName),
         ];
     }
 

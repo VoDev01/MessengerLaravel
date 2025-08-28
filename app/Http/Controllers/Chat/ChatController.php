@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Actions\CreateDirectChatAction;
-use App\Actions\HandleChatMessagesAction;
+use App\Actions\DirectChatOtherUserAction;
+use App\Actions\LoadChatMessagesAction;
 use App\Enums\ChatMessageStatusEnum;
+use App\Enums\ChatTypeEnum;
 use Carbon\Carbon;
 use App\Models\Chat;
 use App\Models\Role;
@@ -42,7 +44,7 @@ class ChatController extends Controller
 
         $chat = Chat::with('users')->where('id', $chat->id)->get()->first();
 
-        return HandleChatMessagesAction::handle($chat, $request, $userIsInChat, 'chat.index');
+        return LoadChatMessagesAction::load($chat, $request, $userIsInChat, 'chat.index');
     }
     public function direct(User $user, Request $request)
     {
@@ -51,7 +53,7 @@ class ChatController extends Controller
 
         $chat = CreateDirectChatAction::create($user);
 
-        return HandleChatMessagesAction::handle($chat, $request, true, 'chat.direct');
+        return LoadChatMessagesAction::load($chat, $request, true, 'chat.direct');
     }
     /**
      * Store a newly created resource in storage.
@@ -68,17 +70,24 @@ class ChatController extends Controller
         ])->id;
 
         $message = ChatMessage::with(['sender'])->where('id', $message)->get()->first();
+        $message->created_at = (new Carbon($message->created_at))->format('H:i');
 
         if ($chat->visibility === ChatVisibilityEnum::Public->value)
         {
-            MessageDeliveredEvent::dispatch($chat->link_name, $message->id, Auth::user());
+            MessageDeliveredEvent::dispatch($chat->link_name, $message->id, $message->created_at);
             broadcast(new MessageSentEvent($message, Auth::user()))->toOthers();
         }
 
         else if ($chat->visibility === ChatVisibilityEnum::Private->value)
         {
-            PrivateMessageDeliveredEvent::dispatch($chat->link_name, $message->id, Auth::user(), $chat->type === 'GROUP' ? 'chat.private.' : 'chat.direct.');
-            broadcast(new PrivateMessageSentEvent($message, Auth::user(), $chat->type === 'GROUP' ? 'chat.private.' : 'chat.direct.'))->toOthers();
+            $channel = $chat->type === ChatTypeEnum::Group->value ? 'chat.private.' : 'chat.direct.';
+            PrivateMessageDeliveredEvent::dispatch($chat->link_name, $message->id, $message->created_at, $channel);
+            broadcast(new PrivateMessageSentEvent($chat->link_name, $message->id, $message->created_at, $channel))->toOthers();
+            if($chat->type === ChatTypeEnum::Direct->value && DirectChatOtherUserAction::getOtherUser($chat)->online)
+            {
+                broadcast(new MessageSeenEvent(['messageId' => $message->id, 'messageCreatedAt' => $message->created_at], 
+                $chat->link_name, $message->created_at, 'chat.direct.'))->toOthers();
+            }
         }
 
         return response()->json(['messageId' => $message->id]);
@@ -106,8 +115,14 @@ class ChatController extends Controller
 
     public function seen(Chat $chat, Request $request)
     {
-        $messageIds = json_decode($request->messageIds);
-        broadcast(new MessageSeenEvent($messageIds, $chat->link_name, Auth::user()))->toOthers();
+        $messages = json_decode($request->messages);
+        $channel = match ($chat->type) {
+            ChatTypeEnum::Group->value => 'chat.',
+            ChatTypeEnum::Direct->value => 'chat.direct.'
+        };
+        if($chat->type !== ChatTypeEnum::Direct->value)
+            $channel = $chat->visibility === ChatVisibilityEnum::Private ? $channel . 'private.' : $channel;
+        broadcast(new MessageSeenEvent($messages, $chat->link_name, $channel))->toOthers();
         return response()->json();
     }
 
