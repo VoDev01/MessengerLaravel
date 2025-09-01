@@ -2,6 +2,7 @@
 
 namespace App\Events\Chat;
 
+use App\DTO\ChatMessageDTO;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
@@ -19,7 +20,7 @@ class MessageDeliveredEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $chatName, public int $id, public string $createdAt)
+    public function __construct(public string $channel, public ChatMessageDTO $message, public int $currentUserId)
     {
         //
     }
@@ -32,7 +33,7 @@ class MessageDeliveredEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat.' . $this->chatName),
+            new PrivateChannel($this->channel . $this->message->chat_link_name),
         ];
     }
 

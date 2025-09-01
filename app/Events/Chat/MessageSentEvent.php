@@ -2,6 +2,7 @@
 
 namespace App\Events\Chat;
 
+use App\DTO\ChatMessageDTO;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
@@ -20,7 +21,7 @@ class MessageSentEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public ChatMessage $message, public User $user)
+    public function __construct(public string $channel, public ChatMessageDTO $message, public int $currentUserId)
     {
         //
     }
@@ -33,7 +34,7 @@ class MessageSentEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('chat.' . $this->message->chat->link_name),
+            new PrivateChannel($this->channel . $this->message->chat_link_name),
         ];
     }
 

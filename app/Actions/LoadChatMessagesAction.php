@@ -11,7 +11,7 @@ class LoadChatMessagesAction
 {
     public static function load(Chat $chat, Request $request, bool $userIsInChat, string $view)
     {
-        $messages = ChatMessage::with(['sender', 'chat'])
+        $messages = ChatMessage::with(['sender:id,name,link_name,pfp', 'chat:id,name,link_name'])
             ->where('chat_id', $chat->id);
 
         if($request->expectsJson())

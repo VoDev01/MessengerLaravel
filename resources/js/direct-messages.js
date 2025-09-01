@@ -1,8 +1,8 @@
 import * as cm from './chat-messages';
 
-cm.listenPrivateChat('chat.direct.');
+cm.listenChat('chat.direct.');
 
-cm.loadSeenMessages();
+cm.readMessages();
 
 cm.loadMessages();
 
