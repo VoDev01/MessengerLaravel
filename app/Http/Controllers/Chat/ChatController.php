@@ -70,18 +70,17 @@ class ChatController extends Controller
         ])->id;
 
         $message = new ChatMessageDTO($id);
-        $message->created_at = (new Carbon($message->created_at))->format('H:i');
 
         if ($chat->visibility === ChatVisibilityEnum::Public->value)
         {
-            MessageSentEvent::dispatch('chat.', $message, Auth::id());
+            MessageSentEvent::dispatch('chat.', $message);
         }
 
         else if ($chat->visibility === ChatVisibilityEnum::Private->value)
         {
             $channel = $chat->type === ChatTypeEnum::Group->value ? 'chat.private.' : 'chat.direct.';
 
-            MessageSentEvent::dispatch($channel, $message, Auth::id(), $channel);
+            MessageSentEvent::dispatch($channel, $message);
         }
 
         return response()->json(['messageId' => $message->id]);

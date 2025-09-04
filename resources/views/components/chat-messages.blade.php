@@ -29,7 +29,7 @@
             </div>
         @else
             <div class="foreign-message" data-message-timestamp="{{ $message->created_at }}"
-                data-message-id="{{ $message->id }}" data-message-status="{{ $message->status }}">
+                data-message-id="{{ $message->id }}">
                 <p>{{ $message->sender->name }}</p>
                 <p>{{ $message->text }}</p>
                 <p>{{ $time }}</p>

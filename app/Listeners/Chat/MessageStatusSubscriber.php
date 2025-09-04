@@ -33,7 +33,7 @@ class MessageStatusSubscriber
         $message->status = ChatMessageStatusEnum::Sent->value;
         $message->save();
         $event->message->status = $message->status;
-        MessageDeliveredEvent::dispatch($event->channel, $event->message, $event->currentUserId);
+        MessageDeliveredEvent::dispatch($event->channel, $event->message);
     }
 
     public function handleMessageDelivered(MessageDeliveredEvent $event): void
@@ -46,7 +46,7 @@ class MessageStatusSubscriber
 
     public function handleMessageSeen(MessageSeenEvent $event): void
     {
-        $messageIds = array_column($event->messages, 'messageId');
+        $messageIds = array_column($event->messages, 'id');
         $messages = ChatMessage::whereIn('id', $messageIds)->get();
         foreach ($messages as $message)
         {

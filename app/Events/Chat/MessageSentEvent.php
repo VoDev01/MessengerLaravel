@@ -21,7 +21,7 @@ class MessageSentEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $channel, public ChatMessageDTO $message, public int $currentUserId)
+    public function __construct(public string $channel, public ChatMessageDTO $message)
     {
         //
     }
