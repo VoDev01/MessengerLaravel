@@ -1,4 +1,4 @@
-<div class="mb-4 d-flex justify-content-start">
+<div class="chat-info">
     @if ($direct)
         <?php
             $otherUser = $chat->users[0]->id === \Illuminate\Support\Facades\Auth::id() ? $chat->users[1] : $chat->users[0];

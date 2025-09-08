@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Actions\AttachMediaToMessageAction;
 use App\Actions\CreateDirectChatAction;
-use App\Actions\DirectChatOtherUserAction;
 use App\Actions\LoadChatMessagesAction;
 use App\DTO\ChatMessageDTO;
-use App\Enums\ChatMessageStatusEnum;
 use App\Enums\ChatTypeEnum;
 use Carbon\Carbon;
 use App\Models\Chat;
@@ -15,15 +14,16 @@ use App\Models\User;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use App\Enums\ChatVisibilityEnum;
+use App\Events\Chat\MessageDeliveredEvent;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Events\Chat\MessageSentEvent;
-use App\Events\Chat\MessageDeliveredEvent;
 use App\Events\Chat\MessageSeenEvent;
-use App\Events\Chat\PrivateMessageSentEvent;
-use App\Events\Chat\PrivateMessageDeliveredEvent;
-use App\Http\Requests\Chat\MessageRequest;
+use App\Http\Requests\Chat\DeleteMessageRequest;
+use App\Http\Requests\Chat\MessageAttachmentRequest;
+use App\Http\Requests\Chat\SendMessageRequest;
+use App\Http\Requests\Chat\UpdateMessageRequest;
 use Illuminate\Support\Facades\Gate;
 
 class ChatController extends Controller
@@ -59,7 +59,7 @@ class ChatController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Chat $chat, MessageRequest $request)
+    public function store(Chat $chat, SendMessageRequest $request)
     {
         $validated = $request->validated();
 
@@ -123,19 +123,57 @@ class ChatController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function delivered(Chat $chat, Request $request)
+    {
+        $messages = json_decode($request->messages, true);
+        
+        $channel = match ($chat->type) {
+            ChatTypeEnum::Group->value => 'chat.',
+            ChatTypeEnum::Direct->value => 'chat.direct.'
+        };
+
+        if($chat->type !== ChatTypeEnum::Direct->value)
+            $channel = $chat->visibility === ChatVisibilityEnum::Private->value ? $channel . 'private.' : $channel;
+
+        broadcast(new MessageDeliveredEvent($messages, $chat->link_name, $channel))->toOthers();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function attach(MessageAttachmentRequest $request)
+    {
+        $validated = $request->validated();
+
+        AttachMediaToMessageAction::attach(ChatMessage::find($request->message_id), $validated['attachments']);
+
+
+    }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chat $chat)
+    public function update(UpdateMessageRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $message = ChatMessage::where('id', $validated['id']);
+
+        $message->update(['text' => $validated['text']]);
+
+        $message->save();
+
+        return response()->json(['message' => $message]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chat $chat)
+    public function destroy(DeleteMessageRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        ChatMessage::destroy($validated['id']);
+
+        return response()->json();
     }
 }

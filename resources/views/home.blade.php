@@ -11,7 +11,7 @@
             $direct = true;
         }
         ?>
-        <a class="mb-3 d-flex justify-content-start chat" href="{{ $chatLink }}" data-chat-id="{{ $chat->id }}">
+        <a class="mb-3 d-flex justify-content-start chat text-decoration-none text-dark" href="{{ $chatLink }}" data-chat-id="{{ $chat->id }}">
             @if (!$direct)
                 <div>
                     <img src="{{ $chat->logo }}" alt="Лого группы" style="border-radius: 50%;" />

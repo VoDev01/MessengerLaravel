@@ -1,6 +1,57 @@
 export const chatName = $('#chat-name').val();
 export const currentUserId = $('#sender-id').val();
 
+$(window).on('load', function () {
+
+    let foreignMessages = $('.foreign-message[data-message-status="SENT"]').get();
+    let messages = [];
+    foreignMessages.forEach(message => {
+        messages.push({ 'id': message.getAttribute('data-message-id'), 'created_at': message.getAttribute('data-message-timestamp') });
+    });
+    if (messages.length !== 0) {
+        $.ajax({
+            url: '/chat/' + chatName + '/delivered',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                messages: JSON.stringify(messages)
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        });
+    }
+
+    let errorInstantiated = false;
+    $('textarea').on('keyup', function (e) {
+        if (this.value.length < 1000) {
+            this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+            if (errorInstantiated) {
+                document.getElementById('text-error').remove();
+                errorInstantiated = false;
+            }
+        }
+        else {
+            this.value = this.value.substring(0, 1000);
+            this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+
+            if (!errorInstantiated) {
+                let error = document.createElement("span");
+                error.id = 'text-error';
+                error.classList.add('text-danger');
+                error.innerHTML = "Длина сообщения не должна превышать 1000 символов";
+                error.style.fontSize = '12px';
+                error.style.marginTop = '5px';
+                this.after(error);
+                errorInstantiated = true;
+            }
+        }
+    });
+    $('textarea').each(function () {
+        this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+    });
+});
+
 function dateTimeToTime(dateTime) {
     return new Date(dateTime).toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' });
 }
@@ -28,15 +79,27 @@ function messageSent(data) {
                 </div>
             `);
         $('html,body').scrollTop($('#message-box').children().last().position().top);
+        let message = { 'id': data.message.id, 'created_at': data.message.created_at };
+        $.ajax({
+            url: '/chat/' + chatName + '/delivered',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                messages: JSON.stringify(message)
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        });
     }
 }
 
 function messageDelivered(data) {
-    $(`.self-message[data-message-id="${data.message.id}"] p:last`).find('i').remove();
-    $(`.self-message[data-message-id="${data.message.id}"] p:last`).html(
-        dateTimeToTime(data.message.created_at) + ' <i class="bi bi-check2-all"></i>'
+    $(`.self-message[data-message-id="${data.id}"] p:last`).find('i').remove();
+    $(`.self-message[data-message-id="${data.id}"] p:last`).html(
+        dateTimeToTime(data.created_at) + ' <i class="bi bi-check2-all"></i>'
     );
-    $(`.self-message[data-message-id="${data.message.id}"]`).attr('data-message-status', 'DELIVERED');
+    $(`.self-message[data-message-id="${data.id}"]`).attr('data-message-status', 'DELIVERED');
 }
 
 function messageSeen(data) {
@@ -53,7 +116,9 @@ export function listenChat(channelName) {
             messageSent(data);
         })
         .listen('.message.delivered', (data) => {
-            messageDelivered(data);
+            data.messages.forEach(message => {
+                messageDelivered(message);
+            });
         })
         .listen('.message.seen', (data) => {
             data.messages.forEach(message => {

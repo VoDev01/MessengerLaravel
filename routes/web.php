@@ -22,6 +22,7 @@ Route::middleware('web')->group(function ()
         Route::post('store', 'store');
         Route::post('join', 'join');
         Route::post('seen', 'seen')->withoutMiddleware(VerifyCsrfToken::class);
+        Route::post('delivered', 'delivered')->withoutMiddleware(VerifyCsrfToken::class);
     });
     Route::get('/direct/{user}', [ChatController::class, 'direct'])->middleware(['auth']);
     Route::controller(UserAuthController::class)->group(function ()

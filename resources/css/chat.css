@@ -11,6 +11,10 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+.self-message>p,.foreign-message>p
+{
+    margin-bottom: 5px;
+}
 .foreign-message {
     display: flex;
     align-items: start;
@@ -24,6 +28,17 @@
     padding: 10px;
     margin-bottom: 10px;
 }
+.message-control>i
+{
+    font-size: 12px;
+    color: black;
+}
+.message-control
+{
+    padding: 0;
+    border: none;
+    background-color: inherit;
+}
 #message-box{
     display: flex;
     flex-direction: column;;
@@ -36,6 +51,23 @@
 .chat-form{
     display: flex;
     justify-content: space-between;
+    background-color: white;
     position: sticky;
-    bottom: 15px;
+    bottom: 0px;
+    padding-bottom: 10px;
+}
+.chat-info{
+    display: flex;
+    background-color: white;
+    flex-direction: row;
+    position: sticky;
+    top: 0px;
+    border-bottom: 1px solid black;
+    margin-bottom: 15px;
+}
+.form-text{
+    resize: none;
+    overflow: hidden;
+    height: fit-content;
+    width: 400px;
 }

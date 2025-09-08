@@ -20,7 +20,7 @@ class MessageDeliveredEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public string $channel, public ChatMessageDTO $message)
+    public function __construct(public array $messages, public string $chatLinkName, public string $channel)
     {
         //
     }
@@ -33,7 +33,7 @@ class MessageDeliveredEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel($this->channel . $this->message->chat_link_name),
+            new PrivateChannel($this->channel . $this->chatLinkName),
         ];
     }
 

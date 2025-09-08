@@ -34,18 +34,18 @@
                 aria-expanded="false" aria-controls="profiles">
                 <i class="bi bi-chevron-down"></i>
             </button>
-            <div class="collapse" id="profiles">
-                <a href="/new_account">Добавить аккаунт</a>
+            <div class="collapse m-2" id="profiles">
+                <a href="/new_account" class="text-decoration-none text-dark p-2">Добавить аккаунт</a>
             </div>
             <div class="d-flex flex-column">
                 <a>Профиль</a>
-                <a href="/chat/create">Создать группу</a>
+                <a href="/chat/create" class="text-decoration-none text-dark">Создать группу</a>
                 <a>Настройки</a>
                 <a>Контакты</a>
                 <a>Избранное</a>
                 <form method="POST" action="/logout"> 
                     @csrf
-                    <button type="submit">Выйти</button>
+                    <button type="submit" class="text-decoration-none border-0 p-0 text-dark" style="background: none;">Выйти</button>
                 </form>
             </div>
         </nav>

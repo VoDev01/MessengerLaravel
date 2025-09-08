@@ -16,6 +16,6 @@ class ChatMessageAttachment extends Model
 
     public function message()
     {
-        return $this->belongsTo(ChatMessage::class, 'chat_message_id', 'id');
+        return $this->belongsTo(ChatMessage::class, 'message_id', 'id');
     }
 }

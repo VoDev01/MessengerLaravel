@@ -32,16 +32,17 @@ class MessageStatusSubscriber
         $message = ChatMessage::where('id', $event->message->id)->get()->first();
         $message->status = ChatMessageStatusEnum::Sent->value;
         $message->save();
-        $event->message->status = $message->status;
-        MessageDeliveredEvent::dispatch($event->channel, $event->message);
     }
 
     public function handleMessageDelivered(MessageDeliveredEvent $event): void
     {
-        $message = ChatMessage::where('id', $event->message->id)->get()->first();
-        $message->status = ChatMessageStatusEnum::Delivered->value;
-        $message->save();
-        $event->message->status = $message->status;
+        $messageIds = array_column($event->messages, 'id');
+        $messages = ChatMessage::whereIn('id', $messageIds)->get();
+        foreach ($messages as $message)
+        {
+            $message->status = ChatMessageStatusEnum::Delivered->value;
+            $message->save();
+        }
     }
 
     public function handleMessageSeen(MessageSeenEvent $event): void

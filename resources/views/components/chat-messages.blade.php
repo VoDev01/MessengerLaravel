@@ -3,33 +3,24 @@
         <?php $time = substr(explode(' ', $message->created_at)[1], 0, 5); ?>
         @if ($message->sender_id === $currentUser->id)
             <div class="self-message" data-message-timestamp="{{ $message->created_at }}"
-                data-message-id="{{ $message->id }}" data-message-status="{{$message->status}}">
+                data-message-id="{{ $message->id }}" data-message-status="{{ $message->status }}">
                 <p>{{ $message->sender->name }}</p>
-                <p>{{ $message->text }}</p>
-                <p>{{ $time }} <?php 
-                    switch($message->status)
-                    {
-                        case 'PROCESSING':
-                            echo '<i class="bi bi-three-dots"></i>';
-                            break;
-                        case 'SENT':
-                            echo '<i class="bi bi-check2"></i>';
-                            break;
-                        case 'DELIVERED':
-                            echo '<i class="bi bi-check2-all"></i>';
-                            break;
-                        case 'SEEN':
-                            echo '<i class="bi bi-check2-all text-primary"></i>';
-                            break;
-                        case 'NOT_SENT':
-                            echo '<i class="bi bi-exclamation-circle"></i>';
-                            break;
-                    }
-                ?></p>
+                <p id="message-{{$message->id}}">{{ $message->text }}</p>
+                <p>{{ $time }}
+                    <?php 
+                        match ($message->status) {
+                            'PROCESSING' =>  call_user_func(function(){ echo '<i class="bi bi-three-dots"></i>'; }),
+                            'SENT' =>  call_user_func(function(){ echo '<i class="bi bi-check2"></i>'; }),
+                            'DELIVERED' => call_user_func(function(){ echo '<i class="bi bi-check2-all"></i>'; }),
+                            'SEEN' => call_user_func(function(){ echo '<i class="bi bi-check2-all text-primary"></i>'; }),
+                            'NOT_SENT' =>  call_user_func(function(){ echo '<i class="bi bi-exclamation-circle"></i>'; })
+                        }
+                    ?>
+                </p>
             </div>
         @else
             <div class="foreign-message" data-message-timestamp="{{ $message->created_at }}"
-                data-message-id="{{ $message->id }}">
+                data-message-id="{{ $message->id }}" data-message-status="{{$message->status}}">
                 <p>{{ $message->sender->name }}</p>
                 <p>{{ $message->text }}</p>
                 <p>{{ $time }}</p>
