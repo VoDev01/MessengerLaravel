@@ -37,7 +37,7 @@ class MessageStatusSubscriber
     public function handleMessageDelivered(MessageDeliveredEvent $event): void
     {
         $messageIds = array_column($event->messages, 'id');
-        $messages = ChatMessage::whereIn('id', $messageIds)->get();
+        $messages = ChatMessage::whereIn('id', $messageIds ?? $event->messages['id'])->get();
         foreach ($messages as $message)
         {
             $message->status = ChatMessageStatusEnum::Delivered->value;
@@ -48,7 +48,7 @@ class MessageStatusSubscriber
     public function handleMessageSeen(MessageSeenEvent $event): void
     {
         $messageIds = array_column($event->messages, 'id');
-        $messages = ChatMessage::whereIn('id', $messageIds)->get();
+        $messages = ChatMessage::whereIn('id', $messageIds ?? $event->messages['id'])->get();
         foreach ($messages as $message)
         {
             $message->status = ChatMessageStatusEnum::Seen->value;

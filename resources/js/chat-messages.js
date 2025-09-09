@@ -25,7 +25,8 @@ $(window).on('load', function () {
     let errorInstantiated = false;
     $('textarea').on('keyup', function (e) {
         if (this.value.length < 1000) {
-            this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+            this.style.height = "";
+            this.style.height = this.scrollHeight + 'px';
             if (errorInstantiated) {
                 document.getElementById('text-error').remove();
                 errorInstantiated = false;
@@ -33,7 +34,8 @@ $(window).on('load', function () {
         }
         else {
             this.value = this.value.substring(0, 1000);
-            this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+            this.style.height = "";
+            this.style.height = this.scrollHeight + 'px';
 
             if (!errorInstantiated) {
                 let error = document.createElement("span");
@@ -48,7 +50,8 @@ $(window).on('load', function () {
         }
     });
     $('textarea').each(function () {
-        this.style.cssText = 'height: ' + this.scrollHeight + 'px;';
+        this.style.height = "";
+        this.style.height = this.scrollHeight + 'px';
     });
 });
 
@@ -116,11 +119,13 @@ export function listenChat(channelName) {
             messageSent(data);
         })
         .listen('.message.delivered', (data) => {
+            data.messages = Array.from(data.messages);
             data.messages.forEach(message => {
                 messageDelivered(message);
             });
         })
         .listen('.message.seen', (data) => {
+            data.messages = Array.from(data.messages);
             data.messages.forEach(message => {
                 messageSeen(message);
             });
@@ -305,6 +310,11 @@ export function submitMessage() {
         e.preventDefault();
 
         let messageForm = $('#chat-form').serializeArray();
+
+        if($('#empty-messages').get() !== undefined)
+        {
+            $('#empty-messages').detach();
+        }
 
         $('#message-box').append(`
         <div class="self-message" data-message-timestamp="${(new Date()).toISOString().slice(0, 19).replace('T', ' ')}" data-message-status="PROCESSING">

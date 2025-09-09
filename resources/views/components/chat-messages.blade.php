@@ -27,6 +27,6 @@
             </div>
         @endif
     @empty
-        <span class="mb-3">В этом чате пока что нет сообщений</span>
+        <span id="empty-messages" class="mb-3">В этом чате пока что нет сообщений</span>
     @endforelse
 </div>
