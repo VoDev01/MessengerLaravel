@@ -1,9 +1,7 @@
 @if ($userIsInChat)
     <form class="chat-form mb-3" action="/chat/{{ $chat->link_name }}/store" method="POST" id="chat-form">
         @csrf
-        <div class="d-flex flex-column">
-            <textarea class="form-text" name="text" id="text" contenteditable spellcheck="false"></textarea>
-        </div>
+        <textarea class="form-text" name="text" id="text" contenteditable spellcheck="false"></textarea>
         <input type="hidden" id="chat-name" value="{{ $chat->link_name }}">
         <input type="hidden" id="sender-name" name="sender-name" value="{{ $currentUser->name }}">
         <input type="hidden" id="sender-id" name="sender-id" value="{{ $currentUser->id }}">

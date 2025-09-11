@@ -6,6 +6,7 @@ use App\Actions\AttachMediaToMessageAction;
 use App\Actions\CreateDirectChatAction;
 use App\Actions\LoadChatMessagesAction;
 use App\DTO\ChatMessageDTO;
+use App\Enums\ChatMessageStatusEnum;
 use App\Enums\ChatTypeEnum;
 use Carbon\Carbon;
 use App\Models\Chat;
@@ -63,24 +64,31 @@ class ChatController extends Controller
     {
         $validated = $request->validated();
 
-        $id = ChatMessage::create([
+        $messageId = ChatMessage::create([
             'sender_id' => Auth::id(),
             'chat_id' => $chat->id,
             'text' => $validated['text']
         ])->id;
 
-        $message = new ChatMessageDTO($id);
+        $message = new ChatMessageDTO($messageId);
+        $unreadMessagesCount = ChatMessage::selectRaw('chat_id, COUNT(id) as unread_messages_count')
+        ->where('chat_id', $chat->id)
+        ->where('status', ChatMessageStatusEnum::Sent->value)
+        ->groupBy('chat_id')
+        ->get()
+        ->first()
+        ->unread_messages_count;
 
         if ($chat->visibility === ChatVisibilityEnum::Public->value)
         {
-            MessageSentEvent::dispatch('chat.', $message);
+            MessageSentEvent::dispatch('chat.', $message, $unreadMessagesCount);
         }
 
         else if ($chat->visibility === ChatVisibilityEnum::Private->value)
         {
             $channel = $chat->type === ChatTypeEnum::Group->value ? 'chat.private.' : 'chat.direct.';
 
-            MessageSentEvent::dispatch($channel, $message);
+            MessageSentEvent::dispatch($channel, $message, $unreadMessagesCount);
         }
 
         return response()->json(['messageId' => $message->id]);

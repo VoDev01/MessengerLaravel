@@ -10,6 +10,9 @@
             <p>{{ $otherUser->name }}</p>
             <p class="user-online" data-user-link="{{$otherUser->link_name}}">{{ $otherUser->online ? 'В сети' : 'Не в сети'}}</p>
         </div>
+        <div class="chat-controls">
+            <a href="/" class="text-decoration-none text-dark"><i class="bi bi-arrow-left chat-control"></i></a>
+        </div>
     @else
         <div>
             <img src="{{ $chat->logo }}" style="border-radius: 50%;" alt="Лого группы" />
@@ -17,6 +20,9 @@
         <div class="mx-3">
             <p>{{ $chat->name }}</p>
             <p id="user-count">{{ $chat->users->count() }} пользователей</p>
+        </div>
+        <div class="chat-controls">
+            <a href="/" class="text-decoration-none text-dark"><i class="bi bi-arrow-left chat-control"></i></a>
         </div>
     @endif
 </div>

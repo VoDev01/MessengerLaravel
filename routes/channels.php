@@ -11,7 +11,7 @@ Broadcast::channel('chat.private.{chat}', function (User $user, Chat $chat) {
 });
 
 Broadcast::channel('chat.{chat}', function (User $user, Chat $chat){
-    return Auth::id() === $user->id;
+    return Auth::check();
 });
 
 Broadcast::channel('chat.direct.{chat}', function(User $user, Chat $chat) {
@@ -19,5 +19,5 @@ Broadcast::channel('chat.direct.{chat}', function(User $user, Chat $chat) {
 });
 
 Broadcast::channel('user.{user}', function(User $user) {
-    return Auth::id() === $user->id;
+    return Auth::check();
 });

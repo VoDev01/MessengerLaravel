@@ -5,16 +5,19 @@
     align-self: end;
     flex-basis: auto;
     min-width: 75px;
-    max-width: 500px;
+    max-width: 320px;
     border: 1px solid black;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
 }
-.self-message>p,.foreign-message>p
-{
+
+.self-message>p,
+.foreign-message>p {
     margin-bottom: 5px;
+    word-break: break-all;
 }
+
 .foreign-message {
     display: flex;
     align-items: start;
@@ -22,33 +25,48 @@
     flex-direction: column;
     flex-basis: auto;
     min-width: 75px;
-    max-width: 500px;
+    max-width: 320px;
     border: 1px solid black;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
 }
-.message-control>i
-{
+
+.message-control>i {
     font-size: 12px;
     color: black;
 }
-.message-control
-{
+
+.message-control {
     padding: 0;
     border: none;
     background-color: inherit;
 }
-#message-box{
-    display: flex;
-    flex-direction: column;;
-}
-#chat-box{
+
+#message-box {
     display: flex;
     flex-direction: column;
+}
+
+#chat-box {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     width: 500px;
 }
-.chat-form{
+
+#nav-bar {
+    width: 320px;
+}
+
+.chat-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+}
+
+.chat-form {
     display: flex;
     justify-content: space-between;
     background-color: white;
@@ -56,7 +74,8 @@
     bottom: 0px;
     padding-bottom: 10px;
 }
-.chat-info{
+
+.chat-info {
     display: flex;
     background-color: white;
     flex-direction: row;
@@ -65,9 +84,38 @@
     border-bottom: 1px solid black;
     margin-bottom: 15px;
 }
-.form-text{
+
+.form-text {
     resize: none;
     overflow: hidden;
     height: fit-content;
-    width: 400px;
+    width: 300px;
+}
+
+.chat-controls {
+    display: flex;
+    flex: 1;
+    justify-content: end;
+    align-items: center;
+}
+
+.chat-control {
+    font-size: 30px;
+}
+
+.unread-messages-count{
+    border: 1px solid black;
+    border-radius: 15px;
+    background-color: inherit;
+    padding: 5px;
+}
+
+@media screen and (max-width: 600px) {
+    #chat-box {
+        width: 100%;
+    }
+
+    .form-text {
+        width: 225px;
+    }
 }

@@ -15,11 +15,10 @@
 </head>
 
 <body class="container-fluid mt-2">
-
-    <div class="row">
-        <nav class="col-2">
+    <div class="d-flex flex-lg-row flex-column h-100">
+        <nav id="nav-bar" style="border-right: 1px solid black;">
             <div class="row">
-                <div class="col">
+                <div class="col-3">
                     @if ($currentUser->default_pfp)
                         <img src="{{ $currentUser->pfp }}" alt="Аватарка {{ $currentUser->name }}"
                             style="border-radius: 50%;">
@@ -28,7 +27,7 @@
                             style="border-radius: 50%;">
                     @endif
                 </div>
-                <div class="col">{{ $currentUser->name }}</div>
+                <div class="col-9"><p>{{ $currentUser->name }}</p></div>
             </div>
             <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#profiles"
                 aria-expanded="false" aria-controls="profiles">
@@ -49,7 +48,7 @@
                 </form>
             </div>
         </nav>
-        <div class="col-10 d-flex flex-column align-items-center">
+        <div class="chat-container">
             <div id="chat-box">
                 {{ $slot }}
             </div>
