@@ -36,7 +36,7 @@
                 @foreach ($unreadMessagesCount as $count)
                     @if ($count->chat_id === $chat->id)
                         <div class="d-flex justify-content-end align-items-center" style="flex: 1;">
-                            <p class="unread-messages-count">{{ $count->unread_messages_count }}</p>
+                            <p class="unread-messages-count">{{ $count->unread_messages_count > 99 ? '99+' : $count->unread_messages_count }}</p>
                         </div>
                         @break
                     @endif

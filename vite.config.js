@@ -13,6 +13,7 @@ export default defineConfig({
                 'resources/js/direct-messages.js',
                 'resources/js/group-messages.js',
                 'resources/js/user-status.js',
+                'resources/js/logout-user.js',
                 'resources/js/listen-chats-sent-messages.js',
                 'resources/js/count-sent-chat-messages.js'
             ],

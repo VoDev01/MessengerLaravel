@@ -8,7 +8,7 @@ $(window).on('load', function () {
     foreignMessages.forEach(message => {
         messages.push({ 'id': message.getAttribute('data-message-id'), 'created_at': message.getAttribute('data-message-timestamp') });
     });
-    if (messages.length !== 0) {
+    if (messages.length != 0) {
         $.ajax({
             url: '/chat/' + chatName + '/delivered',
             method: 'POST',
@@ -82,13 +82,12 @@ function messageSent(data) {
                 </div>
             `);
         $('html,body').scrollTop($('#message-box').children().last().position().top);
-        let message = { 'id': data.message.id, 'created_at': data.message.created_at };
         $.ajax({
             url: '/chat/' + chatName + '/delivered',
             method: 'POST',
             dataType: 'json',
             data: {
-                messages: JSON.stringify(message)
+                message: { 'id': data.message.id, 'created_at': data.message.created_at }
             },
             error: function (e) {
                 console.log(e);
@@ -115,21 +114,54 @@ function messageSeen(data) {
 
 export function listenChat(channelName) {
     window.Echo.private(channelName + chatName)
-        .listen('.message.sent', (data) => {
+        .listen('message.sent', (data) => {
             messageSent(data);
         })
-        .listen('.message.delivered', (data) => {
+        .listen('message.delivered', (data) => {
             data.messages = Array.from(data.messages);
             data.messages.forEach(message => {
                 messageDelivered(message);
             });
         })
-        .listen('.message.seen', (data) => {
+        .listen('message.seen', (data) => {
             data.messages = Array.from(data.messages);
             data.messages.forEach(message => {
                 messageSeen(message);
             });
         });
+}
+
+function changeMessageToSeenStatus(messageSelector) {
+
+    if ($(messageSelector).get().length != 0) {
+        let elementsOnPage = [];
+        let windowHeight = $(window).height();
+        let scrollTop = $(window).scrollTop();
+
+        $(messageSelector).each(function () {
+            let element = $(this);
+            let offset = element.offset();
+            let elementHeight = element.outerHeight();
+
+            if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
+                elementsOnPage.push({ 'id': $(element).attr('data-message-id'), 'created_at': $(element).attr('data-message-timestamp') });
+            }
+        });
+
+        elementsOnPage = JSON.stringify(elementsOnPage);
+
+        $.ajax({
+            method: 'POST',
+            url: '/chat/' + chatName + '/seen',
+            dataType: 'json',
+            data: {
+                messages: elementsOnPage
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        });
+    }
 }
 
 export function readMessages() {
@@ -141,33 +173,7 @@ export function readMessages() {
         mutations.forEach((mutation) => {
             if (mutation.type == 'attributes' && mutation.attributeName == 'data-message-status') {
                 if ($('.self-message[data-message-status="DELIVERED"]').get().length != 0) {
-                    let elementsOnPage = [];
-                    let windowHeight = $(window).height();
-                    let scrollTop = $(window).scrollTop();
-
-                    $('.self-message[data-message-status="DELIVERED"]').each(function () {
-                        let element = $(this);
-                        let offset = element.offset();
-                        let elementHeight = element.outerHeight();
-
-                        if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
-                            elementsOnPage.push({ 'id': $(element).attr('data-message-id'), 'created_at': $(element).attr('data-message-timestamp') });
-                        }
-                    });
-
-                    elementsOnPage = JSON.stringify(elementsOnPage);
-
-                    $.ajax({
-                        method: 'POST',
-                        url: '/chat/' + chatName + '/seen',
-                        dataType: 'json',
-                        data: {
-                            messages: elementsOnPage
-                        },
-                        error: function (e) {
-                            console.log(e);
-                        }
-                    });
+                    changeMessageToSeenStatus('.self-message[data-message-status="DELIVERED"]');
                 }
             }
         })
@@ -175,33 +181,7 @@ export function readMessages() {
     observer.observe(targetNode, config);
     $(window).on('load', function () {
         if ($('.self-message[data-message-status="DELIVERED"]').get().length != 0) {
-            let elementsOnPage = [];
-            let windowHeight = $(window).height();
-            let scrollTop = $(window).scrollTop();
-
-            $('.self-message[data-message-status="DELIVERED"]').each(function () {
-                let element = $(this);
-                let offset = element.offset();
-                let elementHeight = element.outerHeight();
-
-                if (offset.top >= scrollTop && (offset.top + elementHeight) <= (scrollTop + windowHeight)) {
-                    elementsOnPage.push({ 'id': $(element).attr('data-message-id'), 'created_at': $(element).attr('data-message-timestamp') });
-                }
-            });
-
-            elementsOnPage = JSON.stringify(elementsOnPage);
-
-            $.ajax({
-                method: 'POST',
-                url: '/chat/' + chatName + '/seen',
-                dataType: 'json',
-                data: {
-                    messages: elementsOnPage
-                },
-                error: function (e) {
-                    console.log(e);
-                }
-            });
+            changeMessageToSeenStatus('.self-message[data-message-status="DELIVERED"]');
         }
     });
 }
@@ -229,7 +209,10 @@ function createMessage(message, currentUserId) {
     }
     if (message.sender.id == currentUserId) {
         $('#message-box').children().first().before(`
-                            <div class="self-message" data-message-timestamp="${message.created_at}" data-message-id="${message.id}" data-message-status="${message.status}">
+                            <div class="self-message" 
+                            data-message-timestamp="${message.created_at}" 
+                            data-message-id="${message.id}" 
+                            data-message-status="${message.status}">
                                 <p> 
                                     ${message.sender.name} 
                                 </p>
@@ -244,7 +227,9 @@ function createMessage(message, currentUserId) {
     }
     else {
         $('#message-box').children().first().before(`
-                            <div class="foreign-message" data-message-timestamp="${message.created_at}" data-message-id="${message.id}" 
+                            <div class="foreign-message" 
+                            data-message-timestamp="${message.created_at}" 
+                            data-message-id="${message.id}" 
                             data-message-status="${message.status}">
                                 <p> 
                                     ${message.sender.name} 
@@ -261,47 +246,50 @@ function createMessage(message, currentUserId) {
 
 }
 
+function sendLoadMessagesRequest(messagesLoaded, lastMessage) {
+    if (!messagesLoaded) {
+        $.ajax({
+            method: 'GET',
+            url: '/chat/' + chatName,
+            dataType: 'json',
+            data: {
+                lastMessageTime: lastMessage.attr('data-message-timestamp')
+            },
+            error: function (e) {
+                console.log(e);
+            },
+            success: function (data) {
+                if (data.messages == null) {
+                    messagesLoaded = true;
+                }
+                else if (data.messages.length == 1) {
+                    messagesLoaded = true;
+                    let message = data.messages[0];
+                    createMessage(message, data.currentUserId);
+                }
+                data.messages.forEach(message => {
+                    createMessage(message, data.currentUserId);
+                });
+            }
+        });
+    }
+    return messagesLoaded;
+}
+
 export function loadMessages() {
     let allMessagesLoaded = false;
-    let previosY = 0;
 
     $(window).on('load', function () {
         $(window).scrollTop($(document).height());
     });
 
     $(window).on('scroll', function () {
-        if (window.scrollY < previosY && window.scrollY == 0) {
-            if (!allMessagesLoaded) {
-                $.ajax({
-                    method: 'GET',
-                    url: '/chat/' + chatName,
-                    dataType: 'json',
-                    data: {
-                        lastMessageTime: $('#message-box').children().first().attr('data-message-timestamp')
-                    },
-                    error: function (e) {
-                        console.log(e);
-                    },
-                    success: function (data) {
-                        if (data.messages == null) {
-                            allMessagesLoaded = true;
-                            return;
-                        }
-                        else if (data.messages.length == 1) {
-                            allMessagesLoaded = true;
-                            let message = data.messages[0];
-                            createMessage(message, data.currentUserId);
-                            return;
-                        }
-                        data.messages.forEach(message => {
-                            createMessage(message, data.currentUserId);
-                        });
-                    }
-                });
-            }
+        if ($(window).scrollTop() + $(window).height() == $(document).height) {
+            allMessagesLoaded = sendLoadMessagesRequest(allMessagesLoaded, $('#message-box').children().last())
         }
-
-        previosY = window.scrollY;
+        else if (window.scrollY == 0) {
+            allMessagesLoaded = sendLoadMessagesRequest(allMessagesLoaded, $('#message-box').children().first())
+        }
     });
 }
 
@@ -311,8 +299,7 @@ export function submitMessage() {
 
         let messageForm = $('#chat-form').serializeArray();
 
-        if($('#empty-messages').get() !== undefined)
-        {
+        if ($('#empty-messages').get() !== undefined) {
             $('#empty-messages').detach();
         }
 

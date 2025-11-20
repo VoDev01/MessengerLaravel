@@ -14,9 +14,9 @@
     <title>{{ $title }}</title>
 </head>
 
-<body class="container-fluid mt-2">
+<body class="container-fluid g-0">
     <div class="d-flex flex-lg-row flex-column h-100">
-        <nav id="nav-bar" style="border-right: 1px solid black;">
+        <nav id="nav-bar" style="padding-left: 10px; background-color:#e8e8e8;">
             <div class="row">
                 <div class="col-3">
                     @if ($currentUser->default_pfp)
@@ -27,7 +27,9 @@
                             style="border-radius: 50%;">
                     @endif
                 </div>
-                <div class="col-9"><p>{{ $currentUser->name }}</p></div>
+                <div class="col-9">
+                    <p>{{ $currentUser->name }}</p>
+                </div>
             </div>
             <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#profiles"
                 aria-expanded="false" aria-controls="profiles">
@@ -42,9 +44,10 @@
                 <a>Настройки</a>
                 <a>Контакты</a>
                 <a>Избранное</a>
-                <form method="POST" action="/logout"> 
+                <form method="POST" action="/logout">
                     @csrf
-                    <button type="submit" class="text-decoration-none border-0 p-0 text-dark" style="background: none;">Выйти</button>
+                    <button type="submit" class="text-decoration-none border-0 p-0 text-dark"
+                        style="background: none;">Выйти</button>
                 </form>
             </div>
         </nav>
