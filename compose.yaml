@@ -1,0 +1,102 @@
+services:
+  web-app:
+    build:
+      context: .
+      dockerfile: docker/production/Dockerfile
+    ports:
+      - 4433:443
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "https://localhost"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+    user: "vodev:www-data"
+    volumes:
+      - ./:/var/www/
+      - ./.env:/var/www/.env
+      - ./docker/messenger.conf:/etc/apache2/sites-enabled/messenger.conf:ro
+      - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
+      - ./docker/cert:/etc/apache2/cert
+    networks:
+      - msg-backend
+  msg-dbgate:
+    image: dbgate/dbgate
+    restart: unless-stopped
+    ports:
+      - 8003:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      CONNECTIONS: mysql
+
+      LABEL_mysql: MySql
+      SERVER_mysql: db
+      DATABASE_mysql: messengerdb
+      USER_mysql: msg_admin
+      PASSWORD_mysql: msg_admin
+      PORT_mysql: 3306
+      ENGINE_mysql: mysql@msg-dbgate-plugin-mysql
+
+      LOGIN: msg_admin
+      PASSWORD: msg_admin
+      LOGIN_PERMISSIONS_msg_admin: "~*,connections/*,dbops/sql-template/*,dbops/sql-dump/import,dbops/sql-dump/export,dbops/query,dbops/import,dbops/export,dbops/charts,dbops/profiler,settings/change,~widgets/*,widgets/database,widgets/history,widgets/plugins,plugins/install,dbops/model/view,dbops/model/compare,dbops/table/backup"
+
+    volumes:
+      - msg-dbgate-data:/root/.msg-dbgate
+    networks:
+      - msg-backend
+    depends_on:
+      db:
+        condition: service_healthy
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - 8855:8025
+      - 1155:1025
+    networks:
+      - msg-backend
+    depends_on:
+      web-app:
+        condition: service_healthy
+  db:
+    image: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - MYSQL_ROOT_PASSWORD=msg_admin
+      - MYSQL_USER=msg_admin
+      - MYSQL_PASSWORD=msg_admin
+      - MYSQL_DATABASE=messengerdb
+      - LANG=C.UTF_8
+    command: 
+    - --character-set-server=utf8mb4 
+    - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - msg-backend-data:/var/lib/mysql/
+    networks:
+      - msg-backend
+networks:
+  msg-backend:
+volumes:
+  msg-backend-data:
+  msg-dbgate-data:
+    driver: local

@@ -23,12 +23,14 @@ class UserFactory extends Factory
         $name = fake()->name();
         return [
             'name' => $name,
+            'link_name' => '@' . str_replace(" ", "_", strtolower($name)),
             'email' => fake()->unique()->safeEmail(),
             'phone' => rand(11111111111, 99999999999),
             'email_verified_at' => now(),
             'password' => Hash::make('1122334455', ['rounds' => 12]),
             'remember_token' => Str::random(10),
-            'pfp' => 'https://letters.noticeable.io/' . strtoupper(substr($name, 0, 1)) . rand(0, 19) . '.png'
+            'pfp' => 'https://letters.noticeable.io/' . strtoupper(substr($name, 0, 1)) . rand(0, 19) . '.png',
+            'online' => true
         ];
     }
 

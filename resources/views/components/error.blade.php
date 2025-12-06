@@ -1,7 +1,3 @@
 @error($field)
-    <div class="mb-3">
-        <span class="text-danger">
-            {{$message}}
-        </span>
-    </div>
+    <span {{ $attributes->merge(['class' => "text-danger error mb-2"]) }}>{{ $message }}</span>
 @enderror

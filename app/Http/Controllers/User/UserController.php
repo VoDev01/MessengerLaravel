@@ -39,7 +39,7 @@ class UserController extends Controller
     }
     public function logout(Request $request)
     {
-        broadcast(new UserStatusChangedEvent(Auth::user(), false))->toOthers();
+        UserStatusChangedEvent::dispatch(Auth::user(), false);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

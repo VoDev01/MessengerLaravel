@@ -20,6 +20,7 @@ class ChatFactory extends Factory
         $name = $this->faker->word();
         return [
             'name' => $name,
+            'link_name' => '@' . str_replace(" ", "_", strtolower($name)),
             'logo' => 'https://letters.noticeable.io/' . strtoupper(substr($name, 0, 1)) . rand(0, 19) . '.png',
             'created_at' => Carbon::now()->format('Y-d-m H:i:s')
         ];

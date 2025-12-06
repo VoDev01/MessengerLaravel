@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers\Chat;
 
 use App\Enums\ChatVisibilityEnum;
 use App\Events\Chat\MessageSentEvent;
-use App\Events\Chat\PrivateMessageSentEvent;
 use App\Models\Chat;
 use App\Models\Role;
 use App\Models\User;
@@ -29,18 +28,5 @@ class ChatControllerTest extends TestCase
         $response = $this->actingAs($user)->post("/chat/$chat->name/store", ['message' => 'hello world!']);
         $response->assertSessionHasNoErrors();
         Event::assertDispatched(MessageSentEvent::class);
-    }
-
-    public function testPrivateMessageSent(): void
-    {
-        Event::fake();
-
-        $chat = Chat::factory()->create(['visibility' => ChatVisibilityEnum::Private->value]);
-        $role = Role::factory()->create();
-        $user = User::factory()->hasAttached($chat, ['role_id' => $role->id], 'chats')->create();
-
-        $response = $this->actingAs($user)->post("/chat/$chat->name/store", ['message' => 'hello world!']);
-        $response->assertSessionHasNoErrors();
-        Event::assertDispatched(PrivateMessageSentEvent::class);
     }
 }

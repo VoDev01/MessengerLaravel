@@ -24,7 +24,8 @@ class User extends Authenticatable
         'password',
         'pfp',
         'default_pfp',
-        'online'
+        'online',
+        'link_name'
     ];
 
     /**

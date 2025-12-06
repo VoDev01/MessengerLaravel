@@ -6,9 +6,9 @@ use App\Http\Controllers\User\UserController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('web')->group(function ()
+Route::middleware('web')->middleware(['auth'])->group(function ()
 {
-    Route::controller(UserController::class)->middleware(['auth'])->group(function ()
+    Route::controller(UserController::class)->group(function ()
     {
         Route::get('/', 'home')->name('home');
         Route::get('profile', 'profile');
@@ -16,7 +16,8 @@ Route::middleware('web')->group(function ()
         Route::post('logout', 'logout');
         Route::post('chats', 'chats');
     });
-    Route::controller(ChatController::class)->prefix('chat/{chat}')->middleware(['auth'])->group(function()
+    Route::post("chat/create", [ChatController::class, "create"]);
+    Route::controller(ChatController::class)->prefix('chat/{chat}')->group(function()
     {
         Route::get('/', 'group');
         Route::post('store', 'store');
@@ -24,8 +25,8 @@ Route::middleware('web')->group(function ()
         Route::post('seen', 'seen')->withoutMiddleware(VerifyCsrfToken::class);
         Route::post('delivered', 'delivered')->withoutMiddleware(VerifyCsrfToken::class);
     });
-    Route::get('/direct/{user}', [ChatController::class, 'direct'])->middleware(['auth']);
-    Route::controller(UserAuthController::class)->group(function ()
+    Route::get('/direct/{user}', [ChatController::class, 'direct']);
+    Route::controller(UserAuthController::class)->withoutMiddleware(['auth'])->group(function ()
     {
         Route::get('login', 'login')->name('login');
         Route::post('postLogin', 'postLogin');

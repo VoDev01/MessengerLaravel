@@ -1,0 +1,130 @@
+services:
+  web-app:
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile
+    image: messenger-dev-web-app
+    ports:
+      - 8080:80
+    healthcheck:
+      test: ["CMD", "curl", "-kf", "http://localhost"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      db:
+        condition: service_healthy
+    user: "vodev:www-data"
+    volumes:
+      - ./:/var/www/
+      - ./.env.development:/var/www/.env
+      - ./docker/messenger-dev.conf:/etc/apache2/sites-enabled/messenger.conf:ro
+      - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
+      - ./docker/xdebug.ini:/usr/local/php/conf.d/xdebug.ini
+    networks:
+      - msg-backend-dev
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+  user-events-queue:
+    build:
+      context: .
+      dockerfile: docker/development/Dockerfile
+    image: messenger-dev-web-app
+
+    command: ["php", "artisan", "queue:listen", "--sleep=3", "--tries=3", "--timeout=60", "--name=user-events"]
+
+    depends_on:
+      web-app:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
+    user: "vodev:www-data"
+    volumes:
+      - ./:/var/www/
+      - ./.env.development:/var/www/.env
+      - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
+      - ./docker/xdebug.ini:/usr/local/php/conf.d/xdebug.ini
+    networks:
+      - msg-backend-dev
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    
+  msg-dbgate-dev:
+    image: dbgate/dbgate
+    restart: unless-stopped
+    ports:
+      - 8833:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      CONNECTIONS: mysql
+
+      LABEL_mysql: MySql
+      SERVER_mysql: db
+      DATABASE_mysql: messengerdb
+      USER_mysql: msg_admin
+      PASSWORD_mysql: msg_admin
+      PORT_mysql: 3306
+      ENGINE_mysql: mysql@msg-dbgate-dev-plugin-mysql
+
+      LOGIN: msg_admin
+      PASSWORD: msg_admin
+      LOGIN_PERMISSIONS_msg_admin: "*"
+
+    volumes:
+      - msg-dbgate-dev-data:/root/.msg-dbgate-dev
+    networks:
+      - msg-backend-dev
+    depends_on:
+      db:
+        condition: service_healthy
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8025"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - 8855:8025
+      - 1155:1025
+    networks:
+      - msg-backend-dev
+    depends_on:
+      web-app:
+        condition: service_healthy
+  db:
+    image: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - MYSQL_ROOT_PASSWORD=msg_admin
+      - MYSQL_USER=msg_admin
+      - MYSQL_PASSWORD=msg_admin
+      - MYSQL_DATABASE=messengerdb
+      - LANG=C.UTF_8
+    command: 
+    - --character-set-server=utf8mb4 
+    - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - msg-backend-dev-data:/var/lib/mysql/
+    networks:
+      - msg-backend-dev
+networks:
+  msg-backend-dev:
+volumes:
+  msg-backend-dev-data:
+  msg-dbgate-dev-data:
+    driver: local

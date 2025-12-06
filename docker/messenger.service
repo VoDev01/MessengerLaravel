@@ -1,0 +1,13 @@
+[Unit]
+Description=Silerium project messenger queue supervisor
+After=mysql.service
+
+[Service]
+User=root
+Group=www-data
+ExecStart=/usr/bin/php /var/www/html/MessengerLaravel/artisan queue:work --sleep=3 --tries=3
+ExecReload=/usr/bin/php /var/www/html/MessengerLaravel/artisan queue:restart
+Restart=on-failure
+#WorkingDirectory=/var/www/html/MessengerLaravel
+#StandardOutput=append:/var/log/messenger.log
+#StandardError=append:/var/log/messenger.log
