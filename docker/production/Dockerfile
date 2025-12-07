@@ -45,14 +45,14 @@ RUN useradd -m -u $UID -g www-data -o -s /bin/bash $UNAME
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist && \
     npm install --dev && \
     npm run build && \
-    chown vodev:www-data -R . && \
+    chown ${UNAME}:www-data -R . && \
     find . -type f -exec chmod 640 {} + && \
     find . -type d -exec chmod 750 {} + && \
-    find storage -exec chmod 775 {} + && \
+    find storage -type d -exec chmod 775 {} + && \
     find storage/* -type f -exec chmod 664 {} + && \
-    find bootstrap -exec chmod 775 {} + && \
+    find bootstrap -type d -exec chmod 775 {} + && \
     find bootstrap/* -type f -exec chmod 664 {} + && \
-    find public -exec chmod 775 {} + && \
+    find public -type d -exec chmod 775 {} + && \
     find public/* -type f -exec chmod 664 {} +
 
 FROM build AS apache2

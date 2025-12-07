@@ -4,6 +4,7 @@ php artisan view:clear
 php artisan route:clear
 php artisan config:clear
 php artisan cache:clear
+php artisan key:generate --force
 php artisan migrate:fresh --seed
 
 exec "$@"
