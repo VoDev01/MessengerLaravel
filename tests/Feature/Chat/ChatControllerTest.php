@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Chat;
+namespace Tests\Feature\Chat;
 
 use App\Enums\ChatVisibilityEnum;
 use App\Events\Chat\MessageSentEvent;
