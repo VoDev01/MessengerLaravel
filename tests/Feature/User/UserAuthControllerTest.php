@@ -34,23 +34,22 @@ class UserAuthControllerTest extends TestCase
             'email' => $user->email,
             'phone' => $user->phone,
             'name' => $user->name,
+            'link_name' => '@name_123',
             'password' => "1122334455",
             'password_confirm' => "111222333444"
         ]);
-
         $response->assertSessionHasErrors(['password']);
 
         $response = $this->post("/postRegister", [
             'email' => $user->email,
             'phone' => $user->phone,
-            'name' => '@name_123',
-            'link_name' => $user->link_name,
+            'name' => $user->name,
+            'link_name' => '@name_123',
             'password' => "1122334455",
             'password_confirm' => "1122334455"
         ]);
 
         $response->assertSessionHasNoErrors();
-
         $this->assertDatabaseHas('users', ['email' => $user->email]);
 
         $response->assertRedirect();

@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use App\Services\ChatService;
-use App\Services\Interface\Service;
 use App\Http\Controllers\Controller;
 use App\Actions\AttachMediaToMessageAction;
 use App\Http\Requests\Chat\SendMessageRequest;
@@ -19,7 +18,8 @@ class ChatController extends Controller
 {
 
     public function __construct(protected ChatService $chatService)
-    {}
+    {
+    }
     /**
      * Display a listing of the resource.
      */
@@ -60,8 +60,6 @@ class ChatController extends Controller
         $validated = $request->validated();
 
         AttachMediaToMessageAction::attach(ChatMessage::find($request->message_id), $validated['attachments']);
-
-
     }
 
     /**

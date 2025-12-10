@@ -13,7 +13,7 @@ class Chat extends Model
     protected $fillable = [
         'name',
         'logo',
-
+        'link_name'
     ];
 
     public function resolveRouteBinding($value, $field = null)
