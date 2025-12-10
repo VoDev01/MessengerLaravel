@@ -44,6 +44,4 @@
 LICENSE
 README.md
 .env.example
-tests/
 phpunit.xml
-phpunit.xml.dist

@@ -66,9 +66,9 @@ RUN a2enmod ssl && \
     a2dissite 000-default && \
     a2ensite messenger
 
-COPY ./docker/entrypoints/prod.sh /usr/local/bin
+COPY ./docker/entrypoints/prod /usr/local/bin
 
-RUN chmod 775 /usr/local/bin/prod.sh && \
+RUN chmod 775 /usr/local/bin/prod && \
 mkdir /etc/apache2/cert && \
 chown www-data:www-data /etc/apache2/cert && \
 chmod 750 /etc/apache2/cert
@@ -77,6 +77,6 @@ USER www-data
 
 EXPOSE 4433
 
-ENTRYPOINT ["/usr/local/bin/prod.sh"]
+ENTRYPOINT ["/usr/local/bin/prod"]
 
 CMD ["apachectl", "-D", "FOREGROUND"]

@@ -1,0 +1,107 @@
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: docker/testing/Dockerfile
+    image: messenger-test-web-app
+
+    restart: always
+
+    command: [ "php", "artisan", "test", "--env=testing" ]
+
+    ports:
+      - 8080:80
+
+    healthcheck:
+      test: [ "CMD", "curl", "-kf", "http://localhost" ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    depends_on:
+      user-events-queue:
+        condition: service_started
+      db:
+        condition: service_healthy
+
+    user: "vodev:www-data"
+
+    volumes:
+      - ./:/var/www
+      - ./.env.testing:/var/www/.env
+      - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
+      - ./docker/xdebug.ini:/usr/local/php/conf.d/xdebug.ini
+
+    networks:
+      - backend-test
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  user-events-queue:
+    build:
+      context: .
+      dockerfile: docker/testing/Dockerfile
+    image: messenger-test-web-app
+
+    command: [ "php", "artisan", "queue:listen", "--sleep=3", "--tries=3", "--timeout=60", "--name=user-events" ]
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    user: "vodev:www-data"
+
+    volumes:
+      - ./:/var/www
+      - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
+      - ./.env.testing:/var/www/.env
+      - ./docker/xdebug.ini:/usr/local/php/conf.d/xdebug.ini
+    networks:
+      - backend-test
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8025" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    ports:
+      - 8855:8025
+      - 1155:1025
+    networks:
+      - backend-test
+    depends_on:
+      tests:
+        condition: service_healthy
+  db:
+    image: mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: messengerdb_testing
+      LANG: C.UTF_8
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - backend-test-data:/var/lib/mysql/
+    networks:
+      - backend-test
+
+networks:
+  backend-test:
+volumes:
+  backend-test-data:

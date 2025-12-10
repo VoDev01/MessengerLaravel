@@ -8,6 +8,10 @@
             <input type="name" class="form-control" name="name" id="name" />
         </div>
         <div class="mb-3">
+            <label for="link_name" class="form-label">Тэг</label>
+            <input type="name" class="form-control" name="link_name" id="link_name" placeholder="@your_name"/>
+        </div>
+        <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" name="email" id="email" />
         </div>

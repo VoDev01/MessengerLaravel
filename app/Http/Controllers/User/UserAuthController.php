@@ -52,8 +52,9 @@ class UserAuthController extends Controller
             $defaultPfp = false;
         }
 
-        $user = User::create([
+        User::create([
             'name' => $validated['name'],
+            'link_name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
             'phone' => $validated['phone'],
