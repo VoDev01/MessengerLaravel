@@ -9,22 +9,16 @@ USER root
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN apt update && apt install -y --no-install-recommends \
-    apache2-dev \
-    curl \
-    unzip \
-    coreutils \
-    libpq-dev \
-    libonig-dev \
-    libssl-dev \
-    libxml2-dev \
-    libcurl4-openssl-dev \
-    libicu-dev \
-    libzip-dev  && \
+    libxslt1-dev \
+    libzip-dev \
+    curl && \
     install-php-extensions xdebug && \
     composer install && \
     npm install
 
 COPY ./docker/messenger-dev.conf /etc/apache2/sites-available
+COPY ./phpunit.xml.dist .
+COPY ./tests tests
 
 RUN a2dissite messenger && \
     a2dissite 000-default && \

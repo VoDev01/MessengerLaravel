@@ -23,6 +23,7 @@ class UserAuthRegisterRequest extends FormRequest
     {
         return [
             'name' => ['min:2', 'max:50', 'string', 'required'],
+            'link_name' => ['min:2', 'max:50', 'string', 'regex:/^@[a-z0-9_]+$/', 'required', 'unique:users,link_name'],
             'email' => ['min:10', 'max:100', 'email', 'required'],
             'phone' => ['min:6', 'max:20', 'required', 'regex:/^\+?\d{0,3}[\s-]?\(?\d{3}\)?[\s-]?\d{2}[\s-]?\d{2}[\s-]?\d{3}$/'],
             'password' => ['min:10', 'max:100', 'string', 'required', 'confirmed:password_confirm'],
