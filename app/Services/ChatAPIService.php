@@ -10,14 +10,14 @@ use InvalidArgumentException;
 
 class ChatAPIService implements APIService
 {
-    public function index()
+    public function index(): Chat
     {
         $chats = Chat::paginate(15);
 
         return $chats;
     }
 
-    public function show(int|string $id)
+    public function show(int|string $id): Chat
     {
         $chat = null;
         try
@@ -37,7 +37,7 @@ class ChatAPIService implements APIService
         return $chat;
     }
 
-    public function edit(int|string $id, array $validated)
+    public function edit(int|string $id, array $validated): Chat
     {
         $validated = array_filter($validated, fn($k, $v) => isset($v) && !empty($v), ARRAY_FILTER_USE_BOTH);
         $chat = null;
@@ -65,7 +65,7 @@ class ChatAPIService implements APIService
         return $chat;
     }
 
-    public function store(array $validated)
+    public function store(array $validated): bool
     {
         try
         {
@@ -82,7 +82,7 @@ class ChatAPIService implements APIService
         }
     }
 
-    public function delete(int $id)
+    public function delete(int|string $id): void
     {
         $chat = null;
 

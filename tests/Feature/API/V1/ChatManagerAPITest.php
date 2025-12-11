@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ChatAPITest extends TestCase
+class ChatManagerAPITest extends TestCase
 {
     use RefreshDatabase;
     /**

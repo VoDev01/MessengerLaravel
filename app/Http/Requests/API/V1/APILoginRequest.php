@@ -22,7 +22,8 @@ class APILoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            "app_id" => ["string", "min:10", "max:26", "required", "exists:app_api_consumers,app_id"],
+            "app_url" => ["min:10", "max:150", "string", "unique:app_api_consumers,app_url"]            
         ];
     }
 }

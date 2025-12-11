@@ -167,8 +167,8 @@ return [
     */
 
     'persistent_claims' => [
-        // 'foo',
-        // 'bar',
+        'issuer_url',
+        'scope'
     ],
 
     /*

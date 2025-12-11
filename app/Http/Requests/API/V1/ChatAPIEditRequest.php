@@ -4,7 +4,7 @@ namespace App\Http\Requests\API\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class APIRegisterRequest extends FormRequest
+class ChatAPIEditRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,10 @@ class APIRegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "app_url" => ["min:10", "max:150", "string", "unique:app_api_consumers,app_url"],
-            "app_api_endpoint" => ["min:15", "max:150", "string"]
+            'name' => ["min:5", "max:100", "string", "required"],
+            'link_name' => ["min:5", "max:100", "string", "required", "unique:chats,link_name"],
+            'visibility' => ['in:PUBLIC,PRIVATE,PRESENCE'],
+            'type' => ['in:GROUP,DIRECT']
         ];
     }
 }
