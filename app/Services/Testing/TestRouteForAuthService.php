@@ -109,6 +109,10 @@ class TestRouteForAuthService
         }
         //Choose assert function method
 
+
+        if(Auth::guard('api')->check())
+            Auth::guard('api')->logout();
+
         $response = $this->resolveMethod($route, $testCase, null, true, $data, $headers);
 
         $this->assertTestCaseFailed($testCase, $response);
@@ -180,7 +184,8 @@ class TestRouteForAuthService
         array $headers = []
     ): TestResponse
     {
-        Auth::guard('web')->logout();
+        if(Auth::guard('web')->check())
+            Auth::guard('web')->logout();
 
        if (!isset($this->apiUser))
         {

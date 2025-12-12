@@ -43,6 +43,15 @@ class Chat extends Model
         'link_name'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function (Chat $chat) {
+            $chat->logo = $chat->logo ?? 'https://letters.noticeable.io/' . strtoupper(substr($chat->name, 0, 1)) . rand(0, 19) . '.png'; 
+        });
+    }
+
     public function resolveRouteBinding($value, $field = null)
     {
         $linkName = str_contains($value, '@') ? $value : '@' . $value;

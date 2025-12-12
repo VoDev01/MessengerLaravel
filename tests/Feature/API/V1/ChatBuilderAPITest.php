@@ -112,7 +112,7 @@ class ChatBuilderAPITest extends TestCase
     public function testDelete(): void
     {
         $chat = Chat::factory()->create()->first();
-        $apiUser = ApplicationAPIConsumer::factory()->create(['app_url' => 'https://uniqueere.url']);
+        $apiUser = ApplicationAPIConsumer::factory()->create();
         $testRouteAuthSerivce = new TestRouteForAuthService($apiUser, TestRouteMethods::DELETE);
         $response = $testRouteAuthSerivce->testAPIJWTAuth('/api/v1/chat/builder/delete/' . $chat->link_name, $this, data: ['id' => $chat->id]);
 
@@ -121,7 +121,7 @@ class ChatBuilderAPITest extends TestCase
         $this->assertDatabaseMissing('chats', ['id' => $chat->id]);
 
         $chat = Chat::factory()->create()->first();
-        $apiUser = ApplicationAPIConsumer::factory()->create(['app_url' => 'https://unique.url']);
+        $apiUser = ApplicationAPIConsumer::factory()->create(['app_url' => 'https://unique.url', 'app_api_endpoint' => 'https://unique.url/api']);
         $response = $testRouteAuthSerivce->testAPIJWTAuth('/api/v1/chat/builder/delete/' . $chat->link_name, $this, data: ['id' => $chat->link_name]);
 
         $response->assertStatus(200);
