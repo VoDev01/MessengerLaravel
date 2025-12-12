@@ -16,6 +16,7 @@ return new class extends Migration
             $table->primary("app_id", ["app_id"]);
             $table->string("app_url", 150)->unique();
             $table->string("app_api_endpoint", 150)->unique();
+            $table->string("app_secret", 500);
         });
     }
 

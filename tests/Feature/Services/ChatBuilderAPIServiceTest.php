@@ -4,11 +4,11 @@ namespace Tests\Feature\Services;
 
 use Tests\TestCase;
 use App\Models\Chat;
-use App\Services\ChatAPIService;
+use App\Services\ChatBuilderAPIService;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ChatAPIServiceTest extends TestCase
+class ChatBuilderAPIServiceTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -18,7 +18,7 @@ class ChatAPIServiceTest extends TestCase
     {
         $chats = Chat::factory(15)->create();
 
-        $chatAPI = new ChatAPIService();
+        $chatAPI = new ChatBuilderAPIService();
 
         $this->assertNotEmpty($chatAPI->index());
     }
@@ -27,7 +27,7 @@ class ChatAPIServiceTest extends TestCase
     {
         $chat = Chat::factory()->make();
 
-        $chatAPI = new ChatAPIService();
+        $chatAPI = new ChatBuilderAPIService();
 
         $this->assertTrue($chatAPI->store($chat->toArray()));
     }
@@ -36,7 +36,7 @@ class ChatAPIServiceTest extends TestCase
     {
         $chat = Chat::factory()->create();
 
-        $chatAPI = new ChatAPIService();
+        $chatAPI = new ChatBuilderAPIService();
 
         $show = $chatAPI->show($chat->id);
 
@@ -51,7 +51,7 @@ class ChatAPIServiceTest extends TestCase
     {
         $chat = Chat::factory()->create();
 
-        $chatAPI = new ChatAPIService();
+        $chatAPI = new ChatBuilderAPIService();
 
         $edit = $chatAPI->edit($chat->id, array('name' => '1' . $chat->name));
 
@@ -63,7 +63,7 @@ class ChatAPIServiceTest extends TestCase
     {
         $chat = Chat::factory()->create();
 
-        $chatAPI = new ChatAPIService();
+        $chatAPI = new ChatBuilderAPIService();
 
         $chatAPI->delete($chat->id);
 

@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Chat\ChatController;
+use App\Models\ApplicationAPIConsumer;
 use App\Models\Chat;
+use Illuminate\Http\Request;
 use App\Policies\Chat\ChatPolicy;
-use App\Services\ChatService;
-use App\Services\Interface\Service;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(Chat::class, ChatPolicy::class);
+        Gate::policy(Chat::class, ChatPolicy::class); 
+
+        Auth::provider("db_app_consumer", function(Application $app, array $config){
+            return new ApplicationAPIConsumerUserProvider();
+        });
     }
 }

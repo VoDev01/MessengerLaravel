@@ -8,9 +8,9 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
-class ChatAPIService implements APIService
+class ChatBuilderAPIService implements APIService
 {
-    public function index(): Chat
+    public function index(): \Illuminate\Pagination\LengthAwarePaginator
     {
         $chats = Chat::paginate(15);
 
@@ -39,7 +39,7 @@ class ChatAPIService implements APIService
 
     public function edit(int|string $id, array $validated): Chat
     {
-        $validated = array_filter($validated, fn($k, $v) => isset($v) && !empty($v), ARRAY_FILTER_USE_BOTH);
+        $validated = array_filter($validated, fn($k, $v) => isset($k) && !empty($v), ARRAY_FILTER_USE_BOTH);
         $chat = null;
 
 

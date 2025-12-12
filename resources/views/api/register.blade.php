@@ -13,6 +13,11 @@
                 <input type="text" class="form-control" name="app_api_endpoint" id="app_api_endpoint" />
             </div>
             <x-error field="app_api_endpoint" />
+            <div class="mb-3">
+                <label for="app_api_endpoint" class="form-label">App secret</label>
+                <input type="text" class="form-control" name="app_api_endpoint" id="app_api_endpoint" />
+            </div>
+            <x-error field="app_secret" />
             <button type="submit" class="btn btn-primary">
                 Submit
             </button>

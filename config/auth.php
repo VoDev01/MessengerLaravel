@@ -70,7 +70,7 @@ return [
         ],
 
         'app_consumer' => [
-            'driver' => 'eloquent',
+            'driver' => 'db_app_consumer',
             'model' => App\Models\ApplicationAPIConsumer::class,
         ],
     ],

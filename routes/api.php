@@ -27,16 +27,16 @@ Route::middleware(['api'])->prefix("v1")->group(function ()
             Route::get('/', 'index');
             Route::post('/create', 'store');
             Route::get('/{id}', 'show');
-            Route::put('/update', 'update');
-            Route::delete('/delete', 'delete');
+            Route::put('/update/{id}', 'update');
+            Route::delete('/delete/{id}', 'destroy');
         });
 
         Route::controller(ChatAPIController::class)->prefix('chat/{id}')->group(function () {
             Route::get('/', 'index');
             Route::get('/{message_id}', 'show');
-            Route::post('/', 'store');
-            Route::put('/{message_id}', 'update');
-            Route::delete('/{message_id}', 'delete');
+            Route::post('/create', 'store');
+            Route::put('/update/{message_id}', 'update');
+            Route::delete('/delete/{message_id}', 'destroy');
         });
     });
 });

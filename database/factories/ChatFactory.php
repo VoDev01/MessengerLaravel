@@ -17,7 +17,7 @@ class ChatFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->unique()->word();
+        $name = $this->faker->unique()->text(20);
         return [
             'name' => $name,
             'link_name' => '@' . str_replace(" ", "_", strtolower($name)),
