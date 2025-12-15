@@ -20,7 +20,8 @@ class APIAuthController extends Controller
     {
         $validated = $request->validated();
         ApplicationAPIConsumer::create(array_merge(['app_id' => Str::ulid()], $validated));
-        return $this->respondWithToken(auth('api')->attempt(array_filter($validated, fn ($k) => $k !== 'app_api_endpoint', ARRAY_FILTER_USE_KEY)));
+        $app = ApplicationAPIConsumer::where('app_url', $validated['app_url'])->get()->first();
+        return $this->respondWithToken(auth('api')->attempt(['app_id' => $app->app_id, 'app_secret' => $app->app_secret]));
     }
 
     /**
@@ -83,7 +84,7 @@ class APIAuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'scopes' => auth('api')->payload()->get('scope')
         ]);
     }
 }

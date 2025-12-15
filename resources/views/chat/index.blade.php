@@ -4,4 +4,6 @@
     <x-chat-messages :$messages :$currentUser></x-chat-messages>
     <x-chat-form :$currentUser :$chat :$userIsInChat></x-chat-form>
 </x-chats-layout>
-@vite('resources/js/group-messages.js')
+<script type="module">
+    chat.listenGroup();
+</script>

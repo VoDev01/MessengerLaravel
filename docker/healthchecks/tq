@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if pgrep -f "php artisan queue:work" > /dev/null
+then
+    exit 0
+else
+    exit 1
+fi

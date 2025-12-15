@@ -4,4 +4,7 @@
     <x-chat-messages :$messages :$currentUser></x-chat-messages>
     <x-chat-form :$currentUser :$chat :$userIsInChat></x-chat-form>
 </x-chats-layout>
-@vite(['resources/js/direct-messages.js', 'resources/js/user-status.js'])
+<script type='module'>
+    chat.listenDirect();
+    chat.userStatus();
+</script>

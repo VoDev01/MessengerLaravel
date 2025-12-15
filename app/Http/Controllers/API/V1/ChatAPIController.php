@@ -13,10 +13,11 @@ use App\Http\Requests\Chat\SendMessageRequest;
 use App\Http\Requests\Chat\DeleteMessageRequest;
 use App\Http\Requests\Chat\UpdateMessageRequest;
 use App\Http\Requests\Chat\MessageAttachmentRequest;
+use App\Services\ChatMessageService;
 
 class ChatAPIController extends Controller
 {
-    public function __construct(protected ChatService $chatService)
+    public function __construct(protected ChatService $chatService, protected ChatMessageService $chatMessageService)
     {}
     
     public function group(Request $request)
@@ -36,7 +37,7 @@ class ChatAPIController extends Controller
     {
         $validated = $request->validated();
         $chat = Chat::where('link_name', $request->chat_link_name)->get()->first();
-        return $this->chatService->storeMessage($chat, $validated);
+        return $this->chatMessageService->storeMessage($chat, $validated);
     }
 
     public function join(Request $request)
@@ -48,13 +49,13 @@ class ChatAPIController extends Controller
     public function seen(Request $request)
     {
         $chat = Chat::where('link_name', $request->chat_link_name)->get()->first();
-        return $this->chatService->messageSeen($chat, $request);
+        return $this->chatMessageService->messageSeen($chat, $request);
     }
 
     public function delivered(Request $request)
     {
         $chat = Chat::where('link_name', $request->chat_link_name)->get()->first();
-        return $this->chatService->messageDelivered($chat, $request);
+        return $this->chatMessageService->messageDelivered($chat, $request);
     }
 
     public function attach(MessageAttachmentRequest $request)
@@ -70,7 +71,7 @@ class ChatAPIController extends Controller
     public function update(UpdateMessageRequest $request)
     {
         $validated = $request->validated();
-        $this->chatService->updateMessage($validated);
+        $this->chatMessageService->updateMessage($validated);
     }
 
     /**
@@ -79,6 +80,6 @@ class ChatAPIController extends Controller
     public function destroy(DeleteMessageRequest $request)
     {
         $validated = $request->validated();
-        $this->chatService->deleteMessage($validated);
+        $this->chatMessageService->deleteMessage($validated);
     }
 }

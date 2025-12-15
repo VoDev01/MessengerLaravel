@@ -13,11 +13,12 @@ use App\Http\Requests\Chat\SendMessageRequest;
 use App\Http\Requests\Chat\DeleteMessageRequest;
 use App\Http\Requests\Chat\UpdateMessageRequest;
 use App\Http\Requests\Chat\MessageAttachmentRequest;
+use App\Services\ChatMessageService;
 
 class ChatController extends Controller
 {
 
-    public function __construct(protected ChatService $chatService)
+    public function __construct(protected ChatService $chatService, protected ChatMessageService $chatMessageService)
     {
     }
     /**
@@ -37,7 +38,7 @@ class ChatController extends Controller
     public function store(Chat $chat, SendMessageRequest $request)
     {
         $validated = $request->validated();
-        return $this->chatService->storeMessage($chat, $validated);
+        return $this->chatMessageService->storeMessage($chat, $validated);
     }
 
     public function join(Chat $chat)
@@ -47,12 +48,12 @@ class ChatController extends Controller
 
     public function seen(Chat $chat, Request $request)
     {
-        return $this->chatService->messageSeen($chat, $request);
+        return $this->chatMessageService->messageSeen($chat, $request);
     }
 
     public function delivered(Chat $chat, Request $request)
     {
-        return $this->chatService->messageDelivered($chat, $request);
+        return $this->chatMessageService->messageDelivered($chat, $request);
     }
 
     public function attach(MessageAttachmentRequest $request)
@@ -68,7 +69,7 @@ class ChatController extends Controller
     public function update(UpdateMessageRequest $request)
     {
         $validated = $request->validated();
-        $this->chatService->updateMessage($validated);
+        $this->chatMessageService->updateMessage($validated);
     }
 
     /**
@@ -77,6 +78,6 @@ class ChatController extends Controller
     public function destroy(DeleteMessageRequest $request)
     {
         $validated = $request->validated();
-        $this->chatService->deleteMessage($validated);
+        $this->chatMessageService->deleteMessage($validated);
     }
 }

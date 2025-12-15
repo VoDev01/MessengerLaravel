@@ -13,17 +13,13 @@
                 <input type="text" class="form-control" name="app_api_endpoint" id="app_api_endpoint" />
             </div>
             <x-error field="app_api_endpoint" />
-            <div class="mb-3">
-                <label for="app_api_endpoint" class="form-label">App secret</label>
-                <input type="text" class="form-control" name="app_api_endpoint" id="app_api_endpoint" />
-            </div>
-            <x-error field="app_secret" />
             <button type="submit" class="btn btn-primary">
                 Submit
             </button>
         </form>
     </div>
     <script type="module">
+        let token = "";
         $("#register").on('submit', function(e) {
             e.preventDefault();
             $.ajax({
@@ -31,13 +27,17 @@
                 type: "POST",
                 data: $("#register").serialize(),
                 success: function(data) {
-                    $("#register").append("<p>Your application succesfully registered!</p>");
-                    $("#register").append("<p>Here is your app JWT key:</p>");
-                    $("#register").append("<span>" + data.responseJson.token + "</span>")
+                    token = data.access_token;
+                    $("#register").append("<p>Your application is succesfully registered!</p>");
+                    $("#register").append("<p>Here is your JWT token: " +  data.access_token.substring(0, 12) + "... " +
+                        "<button type=\"button\" class=\"btn\" id=\"copyBtn\"><i class=\"bi bi-clipboard\"></i></button>" + "</p>");
+                    let scopes = data.scopes.join(", ");
+                    $("#register").append("<p>Your application has following permissions: " + scopes + "</p>");
+
                 },
                 error: function(errors) {
                     console.log(errors);
-                    $(".error").forEach(element => {
+                    $(".error").get().forEach(element => {
                         errors.forEach(error => {
                             element.innerHtml = error.message;
                         });
@@ -45,6 +45,12 @@
                 }
 
             })
+        });
+
+
+        $("#copyBtn").on('click', function(e){
+            navigator.clipboard.writeText(token);
+            this.innerHtml = "<i class=\"bi bi-clipboard-check\"></i>";
         });
     </script>
 </x-api-layout>

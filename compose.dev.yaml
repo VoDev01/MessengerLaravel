@@ -18,6 +18,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      chat-events-queue:
+        condition: service_healthy
 
     user: "vodev:www-data"
 
@@ -42,19 +44,23 @@ services:
       - backend-dev
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
-  user-events-queue:
+  chat-events-queue:
     build:
       context: .
       dockerfile: docker/development/Dockerfile
     image: messenger-dev-web-app
 
-    command: ["php", "artisan", "queue:listen", "--sleep=3", "--tries=3", "--timeout=60", "--name=user-events"]
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--timeout=60", "--name=chat-events"]
 
     depends_on:
-      web-app:
-        condition: service_healthy
       db:
         condition: service_healthy
+        
+    healthcheck:
+      test: ["CMD", "./docker/healthchecks/tq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
     user: "vodev:www-data"
 

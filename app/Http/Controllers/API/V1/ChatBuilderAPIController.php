@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class ChatBuilderAPIController extends Controller
 {
-    public function __construct(protected ChatBuilderAPIService $chatService)
+    public function __construct(protected ChatBuilderAPIService $chatBuilderService)
     {}
 
     /**
@@ -18,7 +18,7 @@ class ChatBuilderAPIController extends Controller
      */
     public function index()
     {
-       return response()->json(['chats' => $this->chatService->index()]);  
+       return response()->json(['chats' => $this->chatBuilderService->index()]);  
     }
 
     /**
@@ -27,7 +27,7 @@ class ChatBuilderAPIController extends Controller
     public function store(ChatAPICreateRequest $request)
     {
         $validated = $request->validated();
-        $this->chatService->store($validated);
+        $this->chatBuilderService->store($validated);
         return response()->json([true]);
     }
 
@@ -36,7 +36,7 @@ class ChatBuilderAPIController extends Controller
      */
     public function show(string|int $id)
     {
-        return response()->json(['chat' => $this->chatService->show($id)]);
+        return response()->json(['chat' => $this->chatBuilderService->show($id)]);
     }
 
     /**
@@ -45,7 +45,7 @@ class ChatBuilderAPIController extends Controller
     public function update(string|int $id, ChatAPIEditRequest $request)
     {
         $validated = $request->validated();
-        return response()->json(['chat' => $this->chatService->edit($id, $validated)]);
+        return response()->json(['chat' => $this->chatBuilderService->edit($id, $validated)]);
     }
 
     /**
@@ -53,7 +53,7 @@ class ChatBuilderAPIController extends Controller
      */
     public function destroy(string|int $id)
     {
-        $this->chatService->delete($id);
+        $this->chatBuilderService->delete($id);
         return response()->json([true]);
     }
 }

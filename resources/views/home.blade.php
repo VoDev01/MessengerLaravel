@@ -36,7 +36,8 @@
                 @foreach ($unreadMessagesCount as $count)
                     @if ($count->chat_id === $chat->id)
                         <div class="d-flex justify-content-end align-items-center" style="flex: 1;">
-                            <p class="unread-messages-count">{{ $count->unread_messages_count > 99 ? '99+' : $count->unread_messages_count }}</p>
+                            <p class="unread-messages-count">
+                                {{ $count->unread_messages_count > 99 ? '99+' : $count->unread_messages_count }}</p>
                         </div>
                         @break
                     @endif
@@ -44,5 +45,9 @@
             @endif
         </a>
     @endforeach
+    <script type="module">
+        chat.userStatus();
+        chat.countSentMessages();
+        chat.loadChats();
+    </script>
 </x-chats-layout>
-@vite(['resources/js/chat-load-chats.js', 'resources/js/user-status.js', 'resources/js/listen-chats-sent-messages.js'])
