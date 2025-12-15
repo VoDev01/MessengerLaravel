@@ -11,6 +11,18 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        rollupOptions: {
+            external: [
+                "messenger-client-side"
+            ],
+        }
+    },
+    server: {
+        watch: {
+            usePolling: true
+        }
+    },
     resolve: {
         alias: {
             '$': 'jquery'

@@ -77,7 +77,6 @@ services:
     volumes:
       - ./docker/mysql_custom.cnf:/etc/mysql/conf.d/mysql_custom.cnf:ro
       - ./docker/xdebug.ini:/usr/local/php/conf.d/xdebug.ini
-      - ./.env.development:/var/www/.env
     networks:
       - backend-dev
     extra_hosts:
